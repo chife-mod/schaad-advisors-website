@@ -144,7 +144,7 @@ img { display: block; max-width: 100%; }
   bottom: 0;
   width:  538px;
   height: 713px;
-  z-index: 4;
+  z-index: 3;                     /* sits BEHIND service rings */
   pointer-events: none;
   will-change: filter;
 }
@@ -287,7 +287,7 @@ img { display: block; max-width: 100%; }
   bottom: -70px;
   width:  1600px;
   height:  400px;
-  z-index: 3;
+  z-index: 6;                    /* in front of Jakob */
   pointer-events: none;          /* children re-enable */
 }
 
