@@ -76,7 +76,11 @@ img { display: block; max-width: 100%; }
   z-index: 10;
 }
 
-.hero__nav a {
+.hero__nav a,
+.hero__nav a:link,
+.hero__nav a:visited,
+.hero__nav a:active,
+.hero__nav a:focus {
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -87,9 +91,10 @@ img { display: block; max-width: 100%; }
   font-weight:    400;
   letter-spacing: 0;
   text-transform: uppercase;
-  color: #ffffff;            /* explicit — pure white */
+  color: #ffffff !important;     /* defeat browser :visited tint */
   white-space: nowrap;
   transition: opacity 220ms ease;
+  text-decoration: none;
 }
 .hero__nav a:hover { opacity: 0.65; }
 
