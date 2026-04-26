@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Schaad Advisors · Concept 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/service-menu.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!--
+  Hero V3 — Concept 3 · "Cursor as aperture"
+  ============================================================
+  Photos are always visible; the cursor is a virtual camera focal
+  point. Anything close to the cursor sharpens, brightens and
+  scales up; anything far drifts into bokeh blur and dims.
+
+    Depth tiers (z-axis fiction):
+      - Each photo rect has a baked depth (0 = back / 1 = front).
+      - Front rects are bigger, sharper, more opaque, parallax
+        more strongly. Back rects are smaller, blurred, dimmer,
+        parallax less.
+      - Jakob is the anchor: always sharp, never blurs, only
+        a tiny counter-parallax (he subtly tracks the cursor).
+
+    Auto mode (no cursor or cursor idle):
+      - A virtual focal point drifts through the hero on a
+        Lissajous orbit. Every couple of seconds a random photo
+        cross-fades to a new image (no repeats, no on-screen
+        duplicates).
+
+    Mouse mode (cursor moves on hero):
+      - Real cursor takes over as the focal point. After 1.5s
+        of stillness, control hands back to the auto drift.
+
+  Visual language: photographic depth-of-field.
+-->
+<section class="hero">
+
+  <!-- Logo · x=80 y=0 w=328 h=205 -->
+  <a class="hero__logo" href="../" aria-label="Schaad Advisors">
+    <img src="../assets/LogoBig.svg" alt="Schaad Advisors">
+  </a>
+
+  <!-- Nav · Frame 1 · x=845 y=24 w=515 h=40 -->
+  <nav class="hero__nav" aria-label="Hauptnavigation">
+    <a href="#" aria-current="page">Startseite</a>
+    <a href="#">Über mich</a>
+    <a href="#">Lesezeichen</a>
+    <a href="#" class="hero__nav-cta">Kontakt</a>
+    <span class="hero__nav-indicator" aria-hidden="true"></span>
+  </nav>
+
+  <!--
+    Photo rects with baked depth + size + base opacity + base blur.
+    X is locked to the original Figma grid. Y, W/H, depth, blur and
+    opacity are tuned for photographic foreground/background reading.
+
+    --d  : depth 0..1 (1 = front). Drives z-index, parallax strength
+           and focus reactivity.
+    --bo : base opacity (smaller for "deeper" rects).
+    --bb : base blur in px (larger for "deeper" rects).
+    --z  : z-index (higher = more in front).
+  -->
+  <div class="hero__rect" data-r="6"
+       style="--x:-130;--y:290;--w:145;--h:175;--d:0.40;--bo:0.65;--bb:5;--z:3">
+    <img class="hero__rect-img" alt="">
+  </div>
+  <div class="hero__rect" data-r="2"
+       style="--x:65;--y:210;--w:195;--h:235;--d:0.85;--bo:0.92;--bb:1;--z:7">
+    <img class="hero__rect-img" alt="">
+  </div>
+  <div class="hero__rect" data-r="3"
+       style="--x:260;--y:175;--w:165;--h:200;--d:0.55;--bo:0.75;--bb:4;--z:4">
+    <img class="hero__rect-img" alt="">
+  </div>
+  <div class="hero__rect" data-r="4"
+       style="--x:455;--y:290;--w:215;--h:255;--d:0.95;--bo:0.95;--bb:0.5;--z:8">
+    <img class="hero__rect-img" alt="">
+  </div>
+  <div class="hero__rect" data-r="5"
+       style="--x:650;--y:160;--w:130;--h:155;--d:0.30;--bo:0.55;--bb:6;--z:2">
+    <img class="hero__rect-img" alt="">
+  </div>
+  <div class="hero__rect" data-r="7"
+       style="--x:1259;--y:215;--w:180;--h:215;--d:0.70;--bo:0.85;--bb:2;--z:6">
+    <img class="hero__rect-img" alt="">
+  </div>
+  <div class="hero__rect" data-r="8"
+       style="--x:1454;--y:345;--w:125;--h:145;--d:0.25;--bo:0.50;--bb:7;--z:1">
+    <img class="hero__rect-img" alt="">
+  </div>
+
+  <!-- Main rectangle · Jakob — foreground anchor, never blurs -->
+  <div class="hero__main">
+    <img src="../assets/images/C1_Hero_Slider/Jacob_C1.jpg" alt="Dr. Jakob Schaad">
+  </div>
+
+  <!-- Tags row · x=80 y=546 -->
+  <ul class="hero__tags">
+    <li>Advocacy</li>
+    <li>Gov.&thinsp;Relations</li>
+    <li>Regulierung</li>
+    <li>Geopolitik</li>
+  </ul>
+
+  <h1 class="hero__name">Dr. Jakob Schaad</h1>
+
+  <p class="hero__claim">Wissen bündeln.<br>Interessen wahren.<br>Brücken bauen.</p>
+
+  <div class="hero__loc">
+    <span>Zürich</span>
+    <span>Schweiz</span>
+    <span>2026</span>
+  </div>
+
+  <p class="hero__body">Ich begleite internationale Unternehmen, Verbände und Stiftungen in strategischen politischen Fragen. Ökonomisch fundiert und mit mehr als 30 Jahren Erfahrung.</p>
+
+</section>
+
+<!-- GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script>
+/* ──────────────────────────────────────────────────────────────
+   Photo-strip · Concept 3 · "Cursor as aperture"
+   ──────────────────────────────────────────────────────────────*/
+(function () {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  const POOL = [
+    '01.png', '02.png', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg',
+    '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg',
+    '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'
+  ].map(n => `../assets/images/C1_Hero_Slider/${n}`);
+  POOL.forEach(src => { const i = new Image(); i.src = src; });
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* ─── Tunable constants ────────────────────────────────────── */
+  const FOCAL_RADIUS  = 380;   // px around cursor where focus = 1 → 0
+  const PARALLAX_MAX  = 38;    // px max translate at full depth
+  const COUNTER_MAX   = 9;     // px max counter-parallax for Jakob
+  const SCALE_BOOST   = 0.045; // +scale at full focus
+  const OPACITY_BOOST = 0.55;  // additional opacity at full focus
+  const BLUR_REDUCE   = 0.92;  // multiplier reduction at full focus
+
+  // Auto focal drift (Lissajous orbit through the hero)
+  const AUTO_PERIOD_X = 9.0;   // seconds
+  const AUTO_PERIOD_Y = 6.5;
+  const AUTO_AMP_X    = 0.45;  // fraction of hero width
+  const AUTO_AMP_Y    = 0.30;  // fraction of focal-band height
+
+  // Lerp smoothing
+  const FOCAL_LERP    = 0.08;
+
+  // Idle resume
+  const IDLE_RESUME_MS = 1500;
+
+  // Photo cycling (syncopated bursts + pauses)
+  const CYCLE_BURST_MIN  = 600;
+  const CYCLE_BURST_MAX  = 1100;
+  const CYCLE_PAUSE_MIN  = 2800;
+  const CYCLE_PAUSE_MAX  = 4500;
+  const CYCLE_BURST_LEN  = 3;
+
+  /* ─── Per-rect state ───────────────────────────────────────── */
+  const rects = [...hero.querySelectorAll('.hero__rect')];
+  const main  = hero.querySelector('.hero__main');
+  const data  = new WeakMap();
+
+  rects.forEach(rect => {
+    data.set(rect, {
+      depth:      parseFloat(rect.style.getPropertyValue('--d')),
+      bo:         parseFloat(rect.style.getPropertyValue('--bo')),
+      bb:         parseFloat(rect.style.getPropertyValue('--bb')),
+      swapMul:    1,
+      currentSrc: null
+    });
+  });
+
+  /* ─── Global deck (no on-screen dupes, no two-in-a-row) ────── */
+  let deck = shuffle(POOL);
+  let deckIdx = 0;
+  let lastPicked = null;
+
+  function reshuffle() {
+    const last = deck[deck.length - 1];
+    deck = shuffle(POOL);
+    if (deck[0] === last && deck.length > 1) {
+      [deck[0], deck[1]] = [deck[1], deck[0]];
+    }
+    deckIdx = 0;
+  }
+  function isCurrentlyShown(src) {
+    for (const r of rects) if (data.get(r).currentSrc === src) return true;
+    return false;
+  }
+  function nextSrc() {
+    for (let safety = 0; safety < deck.length * 2; safety++) {
+      if (deckIdx >= deck.length) reshuffle();
+      const cand = deck[deckIdx++];
+      if (cand !== lastPicked && !isCurrentlyShown(cand)) {
+        lastPicked = cand; return cand;
+      }
+    }
+    lastPicked = deck[deckIdx % deck.length];
+    return lastPicked;
+  }
+
+  /* ─── Initial population: each rect gets a starting photo ──── */
+  rects.forEach(rect => {
+    const src = nextSrc();
+    data.get(rect).currentSrc = src;
+    rect.querySelector('.hero__rect-img').src = src;
+  });
+
+  /* ─── Cross-fade swap ──────────────────────────────────────── */
+  function crossfadeRect(rect) {
+    const d = data.get(rect);
+    const img = rect.querySelector('.hero__rect-img');
+    gsap.killTweensOf(d);
+    gsap.to(d, {
+      swapMul: 0.10,
+      duration: 0.7,
+      ease: 'sine.inOut',
+      onComplete: () => {
+        const src = nextSrc();
+        d.currentSrc = src;
+        img.src = src;
+        gsap.to(d, { swapMul: 1, duration: 0.8, ease: 'sine.inOut' });
+      }
+    });
+  }
+
+  /* ─── Syncopated cycle scheduler ───────────────────────────── */
+  let cycleTimer = null;
+  let burstLeft  = 0;
+
+  function scheduleNextCycle() {
+    let delay;
+    if (burstLeft > 0) {
+      burstLeft--;
+      delay = CYCLE_BURST_MIN + Math.random() * (CYCLE_BURST_MAX - CYCLE_BURST_MIN);
+    } else {
+      burstLeft = 1 + Math.floor(Math.random() * CYCLE_BURST_LEN);
+      delay = CYCLE_PAUSE_MIN + Math.random() * (CYCLE_PAUSE_MAX - CYCLE_PAUSE_MIN);
+    }
+    cycleTimer = setTimeout(() => {
+      const candidates = rects.filter(r => data.get(r).swapMul > 0.7);
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      if (pick) crossfadeRect(pick);
+      scheduleNextCycle();
+    }, delay);
+  }
+
+  /* ─── Focal point: cursor or auto-drift ────────────────────── */
+  let mouseX = 0, mouseY = 0;
+  let useMouse = false;
+  let idleTimer = null;
+  const bootTime = performance.now();
+
+  let focalX = 0, focalY = 0;
+  let targetX = 0, targetY = 0;
+
+  function autoFocal() {
+    const r = hero.getBoundingClientRect();
+    const t = (performance.now() - bootTime) / 1000;
+    const cx = r.left + r.width / 2;
+    const cy = r.top  + 320;
+    return {
+      x: cx + Math.sin(t * (Math.PI * 2 / AUTO_PERIOD_X))            * r.width  * AUTO_AMP_X,
+      y: cy + Math.sin(t * (Math.PI * 2 / AUTO_PERIOD_Y) + 1.2)      * r.height * AUTO_AMP_Y
+    };
+  }
+
+  // Boot focal at auto-position
+  {
+    const a = autoFocal();
+    focalX = targetX = a.x;
+    focalY = targetY = a.y;
+  }
+
+  /* ─── Per-frame render loop ────────────────────────────────── */
+  function tick() {
+    if (useMouse) {
+      targetX = mouseX; targetY = mouseY;
+    } else {
+      const a = autoFocal();
+      targetX = a.x; targetY = a.y;
+    }
+    focalX += (targetX - focalX) * FOCAL_LERP;
+    focalY += (targetY - focalY) * FOCAL_LERP;
+
+    rects.forEach(rect => {
+      const d = data.get(rect);
+      const r = rect.getBoundingClientRect();
+      const cx = r.left + r.width  / 2;
+      const cy = r.top  + r.height / 2;
+      const dx = focalX - cx;
+      const dy = focalY - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const t = Math.max(0, 1 - dist / FOCAL_RADIUS);
+      const focus = t * t * (3 - 2 * t);    // smoothstep 0..1
+
+      let tx = (focalX - cx) * d.depth * 0.05;
+      let ty = (focalY - cy) * d.depth * 0.05;
+      if (tx >  PARALLAX_MAX) tx =  PARALLAX_MAX;
+      if (tx < -PARALLAX_MAX) tx = -PARALLAX_MAX;
+      if (ty >  PARALLAX_MAX) ty =  PARALLAX_MAX;
+      if (ty < -PARALLAX_MAX) ty = -PARALLAX_MAX;
+
+      const scale   = 1 + focus * SCALE_BOOST;
+      const blur    = d.bb * (1 - focus * BLUR_REDUCE);
+      const opacity = Math.min(1, (d.bo + focus * OPACITY_BOOST)) * d.swapMul;
+
+      gsap.set(rect, { x: tx, y: ty, scale });
+      gsap.set(rect.querySelector('.hero__rect-img'), {
+        opacity,
+        filter: 'blur(' + blur.toFixed(2) + 'px)'
+      });
+    });
+
+    // Jakob — counter-parallax, never blurs
+    if (main) {
+      const r = main.getBoundingClientRect();
+      const cx = r.left + r.width  / 2;
+      const cy = r.top  + r.height / 2;
+      let tx = -(focalX - cx) * 0.018;
+      let ty = -(focalY - cy) * 0.018;
+      if (tx >  COUNTER_MAX) tx =  COUNTER_MAX;
+      if (tx < -COUNTER_MAX) tx = -COUNTER_MAX;
+      if (ty >  COUNTER_MAX) ty =  COUNTER_MAX;
+      if (ty < -COUNTER_MAX) ty = -COUNTER_MAX;
+      gsap.set(main, { x: tx, y: ty });
+    }
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ─── Mouse / idle handover ───────────────────────────────── */
+  function bumpIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => { useMouse = false; }, IDLE_RESUME_MS);
+  }
+  hero.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    useMouse = true;
+    bumpIdle();
+  });
+  hero.addEventListener('mouseleave', () => {
+    clearTimeout(idleTimer);
+    useMouse = false;
+  });
+
+  // Boot the photo cycler
+  scheduleNextCycle();
+})();
+
+/* ──────────────────────────────────────────────────────────────
+   Nav: sliding 40×4 blue indicator (same as Concept 1/2).
+   ──────────────────────────────────────────────────────────────*/
+(function () {
+  const nav = document.querySelector('.hero__nav');
+  if (!nav) return;
+  const ind = nav.querySelector('.hero__nav-indicator');
+  if (!ind) return;
+  const links  = [...nav.querySelectorAll('a:not(.hero__nav-cta)')];
+  const active = nav.querySelector('a[aria-current="page"]');
+
+  function place(target, animated) {
+    if (!target) return;
+    const navRect = nav.getBoundingClientRect();
+    const r       = target.getBoundingClientRect();
+    const x       = r.left - navRect.left;
+    if (animated) gsap.to(ind, { x, duration: 0.4, ease: 'power3.out' });
+    else          gsap.set(ind, { x });
+  }
+  function init() { place(active, false); }
+  init();
+  window.addEventListener('resize', init);
+
+  links.forEach(a => a.addEventListener('mouseenter', () => place(a, true)));
+  nav.addEventListener('mouseleave', () => place(active, true));
+})();
+</script>
+
+<script defer src="../shared/service-menu.js?v=2"></script>
+</body>
+</html>

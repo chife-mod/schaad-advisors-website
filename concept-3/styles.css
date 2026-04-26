@@ -1,0 +1,283 @@
+/*
+ * Concept 3 — Schaad Advisors · Hero V3 ("Cursor as aperture")
+ * Same Swiss-grid foundation, but rects have variable width/height
+ * and are stacked along a fictitious z-axis (depth).
+ * Artboard 1440 × 800
+ *
+ *   Layout strategy:
+ *   - Hero is 100vw × max(100vh, 800px), overflow:hidden.
+ *   - --gutter centers the 1440 artboard horizontally on viewport.
+ *   - --text-shift anchors text-block 48px above viewport bottom.
+ *     (Figma text bottom = 752 → at vh=800 shift=0)
+ *   - --photo-shift = text-shift / 2 keeps photo-strip centered in
+ *     the free space above the text-block (Figma's natural offset
+ *     preserved).
+ *   - All other values are verbatim from Figma JSON (1 px = 1 px).
+ */
+
+:root {
+  --gutter: max(0px, calc((100vw - 1440px) / 2));
+
+  --text-shift:  max(0px, calc(100vh - 800px));
+  --photo-shift: max(0px, calc((100vh - 800px) / 2));
+
+  --rect-light:  #d9d9d9;
+  --rect-dark:   #9b9b9b;
+  --tag-bg:      #edf0f2;
+  --black:       #000000;
+  --white:       #ffffff;
+  --blue:        #116490;
+  --blue-dark:   #0d4f72;
+
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Reset ─────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; }
+html { font-family: var(--font); -webkit-font-smoothing: antialiased; }
+body {
+  background: var(--white);
+  color: var(--black);
+  overflow-x: hidden;
+}
+a   { text-decoration: none; color: inherit; }
+ul  { list-style: none; }
+img { display: block; max-width: 100%; }
+
+/* ─── Hero stage ────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: max(800px, 100vh);
+  background: var(--white);
+  overflow: hidden;
+}
+
+/* ─── Logo · x=80 y=0 w=328 h=205 ──────────────────────────── */
+
+.hero__logo {
+  position: absolute;
+  left:   calc(var(--gutter) + 80px);
+  top:    0;
+  width:  328px;
+  height: 205px;
+  z-index: 10;
+}
+.hero__logo img { display: block; width: 100%; height: 100%; }
+
+/* ─── Nav · Frame 1 · x=845 y=24 w=515 h=40 ─────────────────
+      Frame 12 "Startseite":  w=83
+      Frame 15 "Über mich":   w=78
+      Frame 16 "Lesezeichen": w=94
+      Frame 11 "Kontakt":     w=102 (blue button)
+      All four sit at y=24, h=40. Text inside each at y=37 h=14
+      (so text-rel-y = 13).
+      Active underline (Rectangle 9) inside Startseite frame:
+      y=60 h=4 → bottom 4px of frame.                            */
+
+.hero__nav {
+  position: absolute;
+  left:  calc(var(--gutter) + 845px);
+  top:   24px;
+  width: 515px;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  z-index: 10;
+}
+
+.hero__nav a {
+  position: relative;
+  height: 40px;
+  padding-top: 13px;     /* text y-rel = 13 (text y=37 minus frame y=24) */
+  font-size:      14px;
+  line-height:    14px;
+  font-weight:    400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--black);
+  white-space: nowrap;
+  transition: opacity 160ms ease, background 160ms ease;
+}
+
+.hero__nav a:not(.hero__nav-cta):hover { opacity: 0.55; }
+
+/* Sliding active-state indicator: 40×4 blue, anchored to
+   bottom-left of the nav frame. JS sets its X via transform. */
+.hero__nav-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 4px;
+  background: var(--blue);
+  pointer-events: none;
+}
+
+/* Kontakt button · Frame 11 · w=102 h=40 · blue · white text
+   Text inside at x-rel=18 y-rel=13 w=66                        */
+.hero__nav-cta {
+  background: var(--blue);
+  color: var(--white) !important;
+  padding: 13px 18px 0;
+  height: 40px;
+  width: 102px;
+  border-radius: 3px;
+}
+
+.hero__nav-cta:hover {
+  background: var(--blue-dark);
+  opacity: 1;
+}
+
+/* ─── Hover rectangles · 187×221 ────────────────────────────
+      Default: empty. On hover (vertical-column trigger) an image
+      fades in; on leave it fades back to nothing.
+      All seven rects spaced 8px apart, no overlap.              */
+
+/* Variable size + custom z based on baked depth values from HTML */
+.hero__rect {
+  position: absolute;
+  left:   calc(var(--gutter) + var(--x) * 1px);
+  top:    calc(var(--y) * 1px + var(--photo-shift));
+  width:  calc(var(--w) * 1px);
+  height: calc(var(--h) * 1px);
+  background: transparent;
+  border-radius: 3px;
+  overflow: hidden;
+  z-index: var(--z, 1);
+  /* JS uses transform for parallax + scale, filter for blur,
+     img.opacity for the depth-of-field mix. */
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.hero__rect-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  display: block;
+  will-change: opacity, filter;
+}
+
+/* ─── Main rectangle · x=845 y=118 w=406 h=455 · Jakob portrait ── */
+
+.hero__main {
+  position: absolute;
+  left:   calc(var(--gutter) + 845px);
+  top:    calc(118px + var(--photo-shift));
+  width:  406px;
+  height: 455px;
+  background: transparent;
+  border-radius: 3px;
+  overflow: hidden;
+  z-index: 9;            /* above every rect — Jakob is the anchor */
+  will-change: transform;
+}
+
+.hero__main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── Text block · anchored to viewport bottom (48px gap) ─── */
+
+/* Tags · x=80 y=546 · gap=4 · h=32 · fs=12 lh=15.6 */
+.hero__tags {
+  position: absolute;
+  left: calc(var(--gutter) + 80px);
+  top:  calc(546px + var(--text-shift));
+  display: flex;
+  gap: 4px;
+  z-index: 3;
+}
+.hero__tags li {
+  height: 32px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  background: var(--tag-bg);
+  border-radius: 3px;
+  font-size:      12px;
+  line-height:    15.6px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--black);
+  white-space: nowrap;
+}
+
+/* H1 · x=80 y=594 w=436 · fs=56 lh=56 ls=0 */
+.hero__name {
+  position: absolute;
+  left:  calc(var(--gutter) + 80px);
+  top:   calc(594px + var(--text-shift));
+  width: 436px;
+  font-size:      56px;
+  line-height:    56px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--black);
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* Claim · x=80 y=686 · fs=16 lh=20.8 (3 lines) */
+.hero__claim {
+  position: absolute;
+  left:  calc(var(--gutter) + 80px);
+  top:   calc(686px + var(--text-shift));
+  font-size:      16px;
+  line-height:    20.8px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--black);
+  white-space: nowrap;
+  z-index: 3;
+}
+
+/* Loc · x=299 y=686 w=64 · fs=16 lh=20.8 */
+.hero__loc {
+  position: absolute;
+  left:  calc(var(--gutter) + 299px);
+  top:   calc(686px + var(--text-shift));
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+}
+.hero__loc span {
+  font-size:      16px;
+  line-height:    20.8px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--black);
+}
+
+/* Body · x=845 y=616 w=515 · fs=26 lh=33.8 */
+.hero__body {
+  position: absolute;
+  left:  calc(var(--gutter) + 845px);
+  top:   calc(616px + var(--text-shift));
+  width: 515px;
+  font-size:      26px;
+  line-height:    33.8px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--black);
+  z-index: 3;
+}
+
+/* ─── Reduced motion ────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

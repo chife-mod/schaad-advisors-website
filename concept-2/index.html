@@ -16,17 +16,22 @@
 <!--
   Hero V2 — Concept 2
   Same Swiss-grid foundation as Concept 1, but the photo-strip
-  behaves as a hybrid:
+  behaves as a three-state hybrid:
 
     Random mode (default, no cursor on hero):
       - Photos auto-appear in random columns at randomised Y
         within the spread 192…326. Long, calm fades (≈2s in /
         2s out) — composition breathes.
 
-    Mouse mode (cursor on hero):
+    Mouse mode (cursor moving on hero):
       - Auto-cycle pauses; whatever is currently auto-revealed
         fades out gently. Hovering a column reveals a photo at
-        its FIXED Figma Y (Concept 1 behaviour).
+        its FIXED Figma Y with premium fades (1.0s in / 1.2s out).
+
+    Idle handover (cursor sits still on hero ≥1.5s):
+      - Mouse-revealed rect fades out and the auto-cycle resumes —
+        even though the cursor is still on the hero. Any mousemove
+        snaps back to mouse mode instantly.
 
     On cursor-leave: auto-cycle resumes after a brief pause.
 -->
@@ -122,13 +127,18 @@
     Math.round(Y_MIN + Math.random() * (Y_MAX - Y_MIN));
 
   /* ─── Timings ──────────────────────────────────────────────── */
-  // Random mode — slow, breathing
+  // Random mode — slow, breathing, with syncopated tick rhythm
+  // (so the eye doesn't lock onto a metronomic beat).
   const R_FADE_IN     = 2.0;
-  const R_FADE_IN_EZ  = 'sine.out';        // very gentle
+  const R_FADE_IN_EZ  = 'sine.out';
   const R_HOLD        = 1.5;
   const R_FADE_OUT    = 2.0;
   const R_FADE_OUT_EZ = 'sine.inOut';
-  const R_TICK_MS     = 1800;
+  const R_BURST_MIN_MS = 350;   // quick interval inside a burst
+  const R_BURST_MAX_MS = 700;
+  const R_PAUSE_MIN_MS = 2200;  // longer pause between bursts
+  const R_PAUSE_MAX_MS = 4000;
+  const R_BURST_LEN_MAX = 3;    // up to N reveals per burst
 
   // Mouse mode — slowed vs. Concept 1, more premium
   const M_FADE_IN     = 1.0;
@@ -139,6 +149,10 @@
 
   // Mode-switch fade
   const SWITCH_FADE   = 0.7;
+
+  // After cursor goes idle on hero, this much delay before auto-cycle
+  // resumes. Any mousemove resets the timer and snaps back to mouse mode.
+  const IDLE_RESUME_MS = 1500;
 
   /* ─── State ────────────────────────────────────────────────── */
   const rects         = [...hero.querySelectorAll('.hero__rect')];
@@ -232,14 +246,35 @@
     autoConcealTm.set(rect, t);
   }
 
+  // Syncopated scheduling: bursts of 1…R_BURST_LEN_MAX quick reveals,
+  // then a longer pause; rinse and repeat.
+  let burstRemaining = 0;
+
+  function scheduleNextTick() {
+    let delay;
+    if (burstRemaining > 0) {
+      burstRemaining--;
+      delay = R_BURST_MIN_MS + Math.random() * (R_BURST_MAX_MS - R_BURST_MIN_MS);
+    } else {
+      burstRemaining = 1 + Math.floor(Math.random() * R_BURST_LEN_MAX);
+      delay = R_PAUSE_MIN_MS + Math.random() * (R_PAUSE_MAX_MS - R_PAUSE_MIN_MS);
+    }
+    autoTimer = setTimeout(() => {
+      if (mode !== 'random') return;
+      autoTick();
+      scheduleNextTick();
+    }, delay);
+  }
+
   function startAuto() {
     if (autoTimer) return;
-    autoTick();
-    autoTimer = setInterval(autoTick, R_TICK_MS);
+    autoTick();           // one immediate
+    scheduleNextTick();   // then syncopated rhythm
   }
   function stopAuto() {
-    clearInterval(autoTimer);
+    clearTimeout(autoTimer);
     autoTimer = null;
+    burstRemaining = 0;
     rects.forEach(r => clearTimeout(autoConcealTm.get(r)));
   }
 
@@ -300,10 +335,34 @@
   buildColumns();
   window.addEventListener('resize', buildColumns);
 
-  hero.addEventListener('mouseenter', switchToMouse);
+  // Cursor-idle detection: if the cursor stops moving on the hero for
+  // IDLE_RESUME_MS, hand control back to the auto-cycle. Any subsequent
+  // mousemove snaps back to mouse mode.
+  let idleTimer = null;
+  function bumpIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (mode === 'mouse') {
+        if (active) {
+          conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: 0 });
+          active = null;
+        }
+        switchToRandom();
+      }
+    }, IDLE_RESUME_MS);
+  }
+
+  hero.addEventListener('mouseenter', () => {
+    switchToMouse();
+    bumpIdle();
+  });
 
   hero.addEventListener('mousemove', e => {
+    // Resume mouse mode if cursor woke up while auto was running.
+    if (mode === 'random') switchToMouse();
+    bumpIdle();
     if (mode !== 'mouse') return;
+
     const x = e.clientX - heroLeft;
     const next = rectAt(x);
     if (next !== active) {
@@ -314,6 +373,7 @@
   });
 
   hero.addEventListener('mouseleave', () => {
+    clearTimeout(idleTimer);
     if (active) conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: M_LEAVE_HOLD });
     active = null;
     switchToRandom();
