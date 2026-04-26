@@ -14,11 +14,26 @@
 <body>
 
 <!--
-  Hero V1 — pixel-perfect from Figma node 34:22 (updated layout).
-  Real images live in /assets/images/C1_Hero_Slider/.
-  Main rect: Jacob_C1.jpg (always visible).
-  Hover rects: empty default, image fades in on cursor-column hover,
-  fades back to nothing on leave; each rect cycles through a shuffled deck.
+  Hero — Concept 1
+  Swiss grid + photographic photo-strip · three-state hybrid:
+
+    Random mode (default, no cursor on hero):
+      - Photos auto-appear in random columns at randomised Y
+        within the spread 192…326. Long, calm fades (≈2s in /
+        2s out) — composition breathes. Tick rhythm is syncopated
+        (bursts + pauses) so the eye doesn't lock onto a metronome.
+
+    Mouse mode (cursor moving on hero):
+      - Auto-cycle pauses; whatever is currently auto-revealed
+        fades out gently. Hovering a column reveals a photo at a
+        fresh randomised Y with premium fades (1.0s in / 1.2s out).
+
+    Idle handover (cursor sits still on hero ≥1.5s):
+      - Mouse-revealed rect fades out and the auto-cycle resumes —
+        even though the cursor is still on the hero. Any mousemove
+        snaps back to mouse mode instantly.
+
+    On cursor-leave: auto-cycle resumes after a brief pause.
 -->
 <section class="hero">
 
@@ -36,7 +51,9 @@
     <span class="hero__nav-indicator" aria-hidden="true"></span>
   </nav>
 
-  <!-- Hover rectangles · 187×221 · 8px gap, no overlap -->
+  <!-- Hover rectangles · 187×221 · 8px gap, no overlap.
+       --x is fixed (strict horizontal grid), --y is the BASE Figma y;
+       JS may override --y per appearance in random mode.            -->
   <div class="hero__rect" data-r="6" style="--x:-130;--y:225"><img class="hero__rect-img" alt=""></div>
   <div class="hero__rect" data-r="2" style="--x:65;--y:283"><img class="hero__rect-img" alt=""></div>
   <div class="hero__rect" data-r="3" style="--x:260;--y:216"><img class="hero__rect-img" alt=""></div>
@@ -76,14 +93,11 @@
 
 </section>
 
-<!-- GSAP for hover-reveal photos + sliding nav underline -->
+<!-- GSAP -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 /* ──────────────────────────────────────────────────────────────
-   Photo-strip: vertical-column hover. Empty default → image fades
-   in (0.5s power2.out) → 600ms hold after leave → fades to empty
-   (0.8s power2.inOut). Each rect has its own shuffled deck;
-   on each fully-completed cycle a new image is drawn.
+   Photo-strip · hybrid random / mouse mode
    ──────────────────────────────────────────────────────────────*/
 (function () {
   const hero = document.querySelector('.hero');
@@ -95,7 +109,6 @@
     '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'
   ].map(n => `../assets/images/C1_Hero_Slider/${n}`);
 
-  // Preload everything so hover-reveal is instantaneous.
   POOL.forEach(src => { const i = new Image(); i.src = src; });
 
   function shuffle(arr) {
@@ -107,48 +120,165 @@
     return a;
   }
 
-  const rects     = [...hero.querySelectorAll('.hero__rect')];
-  const timers    = new WeakMap();
-  const rectSrc   = new WeakMap();   // rect → currently-mounted src (null if hidden)
+  /* ─── Y-range (within current Figma spread) ────────────────── */
+  const Y_MIN = 192;
+  const Y_MAX = 326;
+  const randomY = () =>
+    Math.round(Y_MIN + Math.random() * (Y_MAX - Y_MIN));
 
-  // Single global shuffled deck. Every rect draws from it.
-  // No image may appear in two rects simultaneously, and no image
-  // may be drawn twice in a row.
-  let deck       = shuffle(POOL);
-  let deckIdx    = 0;
+  /* ─── Timings ──────────────────────────────────────────────── */
+  // Random mode — slow, breathing, with syncopated tick rhythm
+  // (so the eye doesn't lock onto a metronomic beat).
+  const R_FADE_IN     = 2.0;
+  const R_FADE_IN_EZ  = 'sine.out';
+  const R_HOLD        = 1.5;
+  const R_FADE_OUT    = 2.0;
+  const R_FADE_OUT_EZ = 'sine.inOut';
+  const R_BURST_MIN_MS = 350;   // quick interval inside a burst
+  const R_BURST_MAX_MS = 700;
+  const R_PAUSE_MIN_MS = 2200;  // longer pause between bursts
+  const R_PAUSE_MAX_MS = 4000;
+  const R_BURST_LEN_MAX = 3;    // up to N reveals per burst
+
+  // Mouse mode — premium fades, slower than typical hover transitions
+  const M_FADE_IN     = 1.0;
+  const M_FADE_IN_EZ  = 'power3.out';
+  const M_LEAVE_HOLD  = 600;
+  const M_FADE_OUT    = 1.2;
+  const M_FADE_OUT_EZ = 'power2.inOut';
+
+  // Mode-switch fade
+  const SWITCH_FADE   = 0.7;
+
+  // After cursor goes idle on hero, this much delay before auto-cycle
+  // resumes. Any mousemove resets the timer and snaps back to mouse mode.
+  const IDLE_RESUME_MS = 1500;
+
+  /* ─── State ────────────────────────────────────────────────── */
+  const rects         = [...hero.querySelectorAll('.hero__rect')];
+  const rectSrc       = new WeakMap();
+  const concealTm     = new WeakMap();
+  const autoConcealTm = new WeakMap();
+
+  // Stash each rect's base (Figma) y so we can restore it for mouse mode.
+  rects.forEach(r => { r.dataset.baseY = r.style.getPropertyValue('--y'); });
+
+  /* ─── Global deck (no-repeat-in-a-row, no-on-screen-dupes) ─── */
+  let deck = shuffle(POOL);
+  let deckIdx = 0;
   let lastPicked = null;
 
   function reshuffle() {
-    const lastItem = deck[deck.length - 1];
+    const last = deck[deck.length - 1];
     deck = shuffle(POOL);
-    // Ensure first new item ≠ last old item (anti-boundary-repeat)
-    if (deck[0] === lastItem && deck.length > 1) {
+    if (deck[0] === last && deck.length > 1) {
       [deck[0], deck[1]] = [deck[1], deck[0]];
     }
     deckIdx = 0;
   }
-
   function isCurrentlyShown(src) {
-    for (const rect of rects) if (rectSrc.get(rect) === src) return true;
+    for (const r of rects) if (rectSrc.get(r) === src) return true;
     return false;
   }
-
   function nextSrc() {
-    // Walk the deck until we find a candidate that's neither
-    // currently shown elsewhere nor identical to the previous pick.
     for (let safety = 0; safety < deck.length * 2; safety++) {
       if (deckIdx >= deck.length) reshuffle();
       const cand = deck[deckIdx++];
       if (cand !== lastPicked && !isCurrentlyShown(cand)) {
-        lastPicked = cand;
-        return cand;
+        lastPicked = cand; return cand;
       }
     }
-    // Fallback — shouldn't reach with 20 images & ≤7 simultaneous
     lastPicked = deck[deckIdx % deck.length];
     return lastPicked;
   }
 
+  /* ─── Reveal / Conceal primitives ──────────────────────────── */
+
+  function reveal(rect, { fadeIn, ease, y }) {
+    const img = rect.querySelector('.hero__rect-img');
+    clearTimeout(concealTm.get(rect));
+    clearTimeout(autoConcealTm.get(rect));
+    gsap.killTweensOf(img);
+
+    const op = parseFloat(getComputedStyle(img).opacity) || 0;
+    if (op === 0) {
+      const finalY = (y === null || y === undefined) ? rect.dataset.baseY : y;
+      rect.style.setProperty('--y', finalY);
+      const src = nextSrc();
+      rectSrc.set(rect, src);
+      img.src = src;
+    }
+    gsap.to(img, { opacity: 1, duration: fadeIn, ease });
+  }
+
+  function conceal(rect, { fadeOut, ease, delay }) {
+    const img = rect.querySelector('.hero__rect-img');
+    const t = setTimeout(() => {
+      gsap.to(img, {
+        opacity: 0,
+        duration: fadeOut,
+        ease,
+        onComplete: () => rectSrc.set(rect, null)
+      });
+    }, delay);
+    concealTm.set(rect, t);
+  }
+
+  /* ─── Random-mode auto-cycle ───────────────────────────────── */
+  let mode = 'random';
+  let autoTimer = null;
+
+  function autoTick() {
+    if (mode !== 'random') return;
+    const idle = rects.filter(r => {
+      const img = r.querySelector('.hero__rect-img');
+      return (parseFloat(getComputedStyle(img).opacity) || 0) === 0;
+    });
+    if (idle.length === 0) return;
+
+    const rect = idle[Math.floor(Math.random() * idle.length)];
+    reveal(rect, { fadeIn: R_FADE_IN, ease: R_FADE_IN_EZ, y: randomY() });
+
+    const t = setTimeout(() => {
+      if (mode !== 'random') return;
+      conceal(rect, { fadeOut: R_FADE_OUT, ease: R_FADE_OUT_EZ, delay: 0 });
+    }, (R_FADE_IN + R_HOLD) * 1000);
+    autoConcealTm.set(rect, t);
+  }
+
+  // Syncopated scheduling: bursts of 1…R_BURST_LEN_MAX quick reveals,
+  // then a longer pause; rinse and repeat.
+  let burstRemaining = 0;
+
+  function scheduleNextTick() {
+    let delay;
+    if (burstRemaining > 0) {
+      burstRemaining--;
+      delay = R_BURST_MIN_MS + Math.random() * (R_BURST_MAX_MS - R_BURST_MIN_MS);
+    } else {
+      burstRemaining = 1 + Math.floor(Math.random() * R_BURST_LEN_MAX);
+      delay = R_PAUSE_MIN_MS + Math.random() * (R_PAUSE_MAX_MS - R_PAUSE_MIN_MS);
+    }
+    autoTimer = setTimeout(() => {
+      if (mode !== 'random') return;
+      autoTick();
+      scheduleNextTick();
+    }, delay);
+  }
+
+  function startAuto() {
+    if (autoTimer) return;
+    autoTick();           // one immediate
+    scheduleNextTick();   // then syncopated rhythm
+  }
+  function stopAuto() {
+    clearTimeout(autoTimer);
+    autoTimer = null;
+    burstRemaining = 0;
+    rects.forEach(r => clearTimeout(autoConcealTm.get(r)));
+  }
+
+  /* ─── Mouse-mode (Concept 1 column hover at fixed Y) ───────── */
   let active   = null;
   let columns  = [];
   let heroLeft = 0;
@@ -161,63 +291,100 @@
       return { rect, left: rr.left - r.left, right: rr.right - r.left };
     });
   }
-
   function rectAt(x) {
     for (const c of columns) if (x >= c.left && x <= c.right) return c.rect;
     return null;
   }
 
-  function reveal(rect) {
-    const img = rect.querySelector('.hero__rect-img');
-    clearTimeout(timers.get(rect));
-    gsap.killTweensOf(img);
-    // Only swap src if currently fully hidden — prevents image-snap
-    // when user re-hovers during fade-out (and avoids picking a new
-    // image when the same one is still partially visible).
-    const op = parseFloat(getComputedStyle(img).opacity) || 0;
-    if (op === 0) {
-      const src = nextSrc();
-      rectSrc.set(rect, src);
-      img.src = src;
+  function switchToMouse() {
+    if (mode === 'mouse') return;
+    mode = 'mouse';
+    stopAuto();
+    rects.forEach(r => {
+      const img = r.querySelector('.hero__rect-img');
+      const op = parseFloat(getComputedStyle(img).opacity) || 0;
+      if (op > 0) {
+        gsap.killTweensOf(img);
+        clearTimeout(concealTm.get(r));
+        gsap.to(img, {
+          opacity: 0,
+          duration: SWITCH_FADE,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            rectSrc.set(r, null);
+            r.style.setProperty('--y', r.dataset.baseY);
+          }
+        });
+      } else {
+        r.style.setProperty('--y', r.dataset.baseY);
+      }
+    });
+  }
+
+  function switchToRandom() {
+    if (mode === 'random') return;
+    mode = 'random';
+    if (active) {
+      conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: M_LEAVE_HOLD });
+      active = null;
     }
-    gsap.to(img, { opacity: 1, duration: 0.5, ease: 'power2.out' });
+    setTimeout(() => { if (mode === 'random') startAuto(); }, 1200);
   }
 
-  function conceal(rect) {
-    const img = rect.querySelector('.hero__rect-img');
-    const t = setTimeout(() => {
-      gsap.to(img, {
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.inOut',
-        onComplete: () => rectSrc.set(rect, null)   // free the image globally
-      });
-    }, 600);
-    timers.set(rect, t);
-  }
-
+  /* ─── Wire up ──────────────────────────────────────────────── */
   buildColumns();
   window.addEventListener('resize', buildColumns);
 
+  // Cursor-idle detection: if the cursor stops moving on the hero for
+  // IDLE_RESUME_MS, hand control back to the auto-cycle. Any subsequent
+  // mousemove snaps back to mouse mode.
+  let idleTimer = null;
+  function bumpIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (mode === 'mouse') {
+        if (active) {
+          conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: 0 });
+          active = null;
+        }
+        switchToRandom();
+      }
+    }, IDLE_RESUME_MS);
+  }
+
+  hero.addEventListener('mouseenter', () => {
+    switchToMouse();
+    bumpIdle();
+  });
+
   hero.addEventListener('mousemove', e => {
+    // Resume mouse mode if cursor woke up while auto was running.
+    if (mode === 'random') switchToMouse();
+    bumpIdle();
+    if (mode !== 'mouse') return;
+
     const x = e.clientX - heroLeft;
     const next = rectAt(x);
     if (next !== active) {
-      if (active) conceal(active);
-      if (next)   reveal(next);
+      if (active) conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: M_LEAVE_HOLD });
+      // Mouse hover also randomises Y — every reveal is a fresh height.
+      if (next)   reveal(next,   { fadeIn:  M_FADE_IN, ease: M_FADE_IN_EZ, y: randomY() });
       active = next;
     }
   });
 
   hero.addEventListener('mouseleave', () => {
-    if (active) conceal(active);
+    clearTimeout(idleTimer);
+    if (active) conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: M_LEAVE_HOLD });
     active = null;
+    switchToRandom();
   });
+
+  startAuto();
 })();
 
 /* ──────────────────────────────────────────────────────────────
-   Nav: sliding 40×4 blue indicator. Slides under hovered link,
-   returns to active on mouse-leave.
+   Nav: sliding 40×4 blue indicator
    ──────────────────────────────────────────────────────────────*/
 (function () {
   const nav = document.querySelector('.hero__nav');
@@ -235,7 +402,6 @@
     if (animated) gsap.to(ind, { x, duration: 0.4, ease: 'power3.out' });
     else          gsap.set(ind, { x });
   }
-
   function init() { place(active, false); }
   init();
   window.addEventListener('resize', init);

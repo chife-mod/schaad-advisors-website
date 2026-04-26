@@ -21,15 +21,9 @@
       path: "",
     },
     {
-      id: "concept-2",
-      label: "Concept 2",
-      desc: "Hybrid: random photo-strip + mouse priority",
-      path: "concept-2/",
-    },
-    {
       id: "concept-1",
       label: "Concept 1",
-      desc: "Editorial Master + smart entrance",
+      desc: "Hybrid hero · random photo-strip + mouse priority",
       path: "concept-1/",
     },
     {
@@ -40,9 +34,9 @@
     },
   ];
 
-  // The "default" / latest concept — shown in the pill when the user is
-  // on the launcher page (so they can jump straight to the newest preview).
-  const DEFAULT_VERSION_ID = "concept-2";
+  // The default concept — shown in the pill on the launcher page so the
+  // user lands one click away from the live preview.
+  const DEFAULT_VERSION_ID = "concept-1";
 
   // Detect base URL by locating this script's <script> tag.
   function detectBase() {
