@@ -21,10 +21,10 @@
       path: "",
     },
     {
-      id: "wireframe",
-      label: "Wireframe",
-      desc: "Original mockup from client (2026-04-15)",
-      path: "wireframe/",
+      id: "concept-2",
+      label: "Concept 2",
+      desc: "Hybrid: random photo-strip + mouse priority",
+      path: "concept-2/",
     },
     {
       id: "concept-1",
@@ -32,7 +32,17 @@
       desc: "Editorial Master + smart entrance",
       path: "concept-1/",
     },
+    {
+      id: "wireframe",
+      label: "Wireframe",
+      desc: "Original mockup from client (2026-04-15)",
+      path: "wireframe/",
+    },
   ];
+
+  // The "default" / latest concept — shown in the pill when the user is
+  // on the launcher page (so they can jump straight to the newest preview).
+  const DEFAULT_VERSION_ID = "concept-2";
 
   // Detect base URL by locating this script's <script> tag.
   function detectBase() {
@@ -53,8 +63,9 @@
         return v.id;
       }
     }
-    // Default: launcher when path === base or base + 'index.html'.
-    return "launcher";
+    // Default: when on the launcher page, surface the latest concept in
+    // the pill so the user can jump to it in one click.
+    return DEFAULT_VERSION_ID;
   }
 
   function svgLayers() {
