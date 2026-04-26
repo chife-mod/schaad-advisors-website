@@ -20,21 +20,27 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px 10px 12px;
-  background: rgba(18, 22, 28, 0.88);
-  backdrop-filter: saturate(160%) blur(10px);
-  -webkit-backdrop-filter: saturate(160%) blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(28, 34, 42, 0.94);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  opacity: 0.65;
-  transition: opacity 200ms ease, transform 200ms ease, background 200ms ease;
+  opacity: 0.92;
+  color: #f5f5f5;
+  font: inherit;
+  transition: opacity 200ms ease, transform 200ms ease, background 200ms ease, border-color 200ms ease;
 }
 
 .service-menu:hover .service-menu__capsule,
 .service-menu[data-open="true"] .service-menu__capsule {
   opacity: 1;
-  background: rgba(18, 22, 28, 0.96);
+  background: rgba(34, 42, 52, 1);
+  border-color: rgba(255, 255, 255, 0.26);
 }
 
 .service-menu[data-open="true"] .service-menu__capsule {
@@ -45,18 +51,21 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  opacity: 0.85;
+  opacity: 1;
+  color: #9FBACD;
 }
 
 .service-menu__label {
   font-weight: 500;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  color: #ffffff;
 }
 
 .service-menu__label-prefix {
-  color: rgba(245, 245, 245, 0.55);
+  color: rgba(245, 245, 245, 0.65);
   margin-right: 4px;
+  font-weight: 400;
 }
 
 .service-menu__caret {
@@ -74,15 +83,18 @@
 .service-menu__panel {
   position: absolute;
   right: 0;
-  bottom: calc(100% + 8px);
-  min-width: 280px;
+  bottom: calc(100% + 10px);
+  min-width: 300px;
   padding: 6px;
-  background: rgba(18, 22, 28, 0.96);
-  backdrop-filter: saturate(160%) blur(12px);
-  -webkit-backdrop-filter: saturate(160%) blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(28, 34, 42, 0.98);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;
