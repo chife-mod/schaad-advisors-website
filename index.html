@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Schaad Advisors — Preview Launcher</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23116490'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='42' fill='white'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="shared/service-menu.css">
+<style>
+:root {
+  --blue: #116490;
+  --blue-dark: #0d4f72;
+  --blue-light: #9FBACD;
+  --blue-pale: #e8f2f7;
+  --charcoal: #1e2a35;
+  --mid: #6b7c8d;
+  --light: #f4f6f8;
+  --border: #d8e5ed;
+  --white: #fff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--charcoal);
+  color: var(--white);
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0a1219 0%, #1e2a35 100%);
+}
+
+.launcher {
+  flex: 1;
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 80px 32px 120px;
+}
+
+.launcher__header {
+  margin-bottom: 64px;
+}
+
+.launcher__eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--blue-light);
+  margin-bottom: 20px;
+}
+
+.launcher__title {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-bottom: 16px;
+}
+
+.launcher__title em {
+  font-style: normal;
+  color: var(--blue-light);
+}
+
+.launcher__subtitle {
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 640px;
+}
+
+.launcher__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 64px;
+}
+
+.version-card {
+  display: block;
+  padding: 28px 28px 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 240ms ease, background 240ms ease, border-color 240ms ease;
+}
+
+.version-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.version-card__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--blue-light);
+  margin-bottom: 16px;
+}
+
+.version-card__tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.version-card__title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.version-card__desc {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 20px;
+}
+
+.version-card__cta {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.version-card__cta::after {
+  content: "→";
+  transition: transform 200ms ease;
+  display: inline-block;
+}
+
+.version-card:hover .version-card__cta::after {
+  transform: translateX(4px);
+}
+
+.version-card[data-status="planned"] {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+.version-card[data-status="planned"] .version-card__cta::after {
+  content: "·";
+}
+
+.launcher__meta {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px 40px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.launcher__meta-block dt {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 6px;
+}
+
+.launcher__meta-block dd a {
+  color: var(--blue-light);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease;
+}
+
+.launcher__meta-block dd a:hover {
+  border-bottom-color: var(--blue-light);
+}
+
+.launcher__footer {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.02em;
+  margin-top: 56px;
+}
+</style>
+</head>
+<body>
+<main class="launcher">
+  <header class="launcher__header">
+    <span class="launcher__eyebrow">Schaad Advisors · Internal Preview</span>
+    <h1 class="launcher__title">Design <em>Versions</em></h1>
+    <p class="launcher__subtitle">
+      Каркас превью-версий сайта Dr. Jakob Schaad. Каждая карточка — полностью изолированная HTML-страница.
+      Внизу справа всегда виден service-menu для переключения между версиями.
+    </p>
+  </header>
+
+  <div class="launcher__grid">
+    <a class="version-card" href="wireframe/">
+      <span class="version-card__tag">Original</span>
+      <h2 class="version-card__title">Wireframe</h2>
+      <p class="version-card__desc">
+        Исходный HTML-вайрфрейм от клиента (2026-04-15). Используется как референс структуры и контента.
+      </p>
+      <span class="version-card__cta">Открыть</span>
+    </a>
+
+    <a class="version-card" href="concept-1/">
+      <span class="version-card__tag">In progress</span>
+      <h2 class="version-card__title">Concept 1</h2>
+      <p class="version-card__desc">
+        Editorial Master + smart entrance. Главная страница, фундамент типографики и системы анимаций.
+      </p>
+      <span class="version-card__cta">Открыть</span>
+    </a>
+
+    <div class="version-card" data-status="planned">
+      <span class="version-card__tag">Planned</span>
+      <h2 class="version-card__title">Concept 2</h2>
+      <p class="version-card__desc">
+        Альтернативное направление по запросу клиента. Появится после первого ревью.
+      </p>
+      <span class="version-card__cta">—</span>
+    </div>
+  </div>
+
+  <dl class="launcher__meta">
+    <div class="launcher__meta-block">
+      <dt>Stack</dt>
+      <dd>Custom hybrid classic WP theme · Inter Variable · GSAP · Vite (фаза 2)</dd>
+    </div>
+    <div class="launcher__meta-block">
+      <dt>Documentation</dt>
+      <dd>
+        <a href="https://github.com/chife-mod/schaad-advisors-website/blob/main/03_docs/01-design-brief.md" target="_blank" rel="noopener">Design Brief</a><br>
+        <a href="https://github.com/chife-mod/schaad-advisors-website/blob/main/03_docs/02-decisions-log.md" target="_blank" rel="noopener">Decisions Log</a>
+      </dd>
+    </div>
+    <div class="launcher__meta-block">
+      <dt>Production target</dt>
+      <dd>schaadadvisors.ch (фаза 2, после утверждения дизайна)</dd>
+    </div>
+  </dl>
+
+  <p class="launcher__footer">
+    Internal preview · not for public distribution · © 2026 Schaad Advisors
+  </p>
+</main>
+
+<script defer src="shared/service-menu.js"></script>
+</body>
+</html>
