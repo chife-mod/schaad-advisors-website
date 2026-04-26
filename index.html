@@ -297,72 +297,93 @@ body {
   transform: translateX(2px);
 }
 
-/* === Activity log === */
-.activity-log {
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  padding-left: 0;
-  margin: 0;
+/* === Project stages === */
+.stage-track {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.activity-item {
+.stage {
   position: relative;
-  padding: 0 0 28px 28px;
+  padding: 18px 18px 16px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: background 200ms ease, border-color 200ms ease;
 }
 
-.activity-item:last-child { padding-bottom: 4px; }
-
-.activity-item::before {
-  content: "";
-  position: absolute;
-  left: -4.5px;
-  top: 6px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 0 3px rgba(18, 22, 28, 1);
+.stage[data-status="done"] {
+  background: rgba(79, 197, 156, 0.05);
+  border-color: rgba(79, 197, 156, 0.22);
 }
 
-.activity-item:first-child::before {
-  background: var(--blue-light);
-  box-shadow: 0 0 0 3px rgba(18, 22, 28, 1), 0 0 0 6px rgba(159, 186, 205, 0.18);
+.stage[data-status="active"] {
+  background: rgba(159, 186, 205, 0.08);
+  border-color: rgba(159, 186, 205, 0.38);
 }
 
-.activity-item__date {
-  display: block;
+.stage__index {
   font-size: 11px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.42);
-  margin-bottom: 4px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
   font-variant-numeric: tabular-nums;
+  margin-bottom: 10px;
 }
 
-.activity-item__title {
+.stage[data-status="done"]   .stage__index { color: #4fc59c; }
+.stage[data-status="active"] .stage__index { color: var(--blue-light); }
+
+.stage__name {
   font-size: 15px;
   font-weight: 500;
   color: var(--white);
   letter-spacing: -0.005em;
-  margin-bottom: 4px;
+  margin-bottom: 14px;
+  line-height: 1.25;
 }
 
-.activity-item__desc {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.55);
+.stage[data-status="pending"] .stage__name { color: rgba(255, 255, 255, 0.55); }
+
+.stage__progress {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
 }
 
-.activity-item__desc a {
-  color: var(--blue-light);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 200ms ease;
+.stage__progress span {
+  display: block;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  transition: width 600ms ease;
 }
 
-.activity-item__desc a:hover {
-  border-bottom-color: var(--blue-light);
+.stage[data-status="done"]   .stage__progress span { background: #4fc59c; }
+.stage[data-status="active"] .stage__progress span { background: var(--blue-light); }
+
+.stage__status {
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+.stage[data-status="done"]   .stage__status { color: rgba(79, 197, 156, 0.9); }
+.stage[data-status="active"] .stage__status { color: rgba(159, 186, 205, 0.92); }
+
+@media (max-width: 760px) {
+  .stage-track { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stage-track { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -463,46 +484,39 @@ body {
 
   </div>
 
-  <h2 class="launcher__section-title">Activity log</h2>
-  <ul class="activity-log">
-    <li class="activity-item">
-      <span class="activity-item__date">2026-04-26 · 14:00</span>
-      <div class="activity-item__title">Preview launcher live on GitHub Pages</div>
-      <div class="activity-item__desc">
-        Scaffold with floating service-menu, original wireframe imported, Concept 1 placeholder and auto-deploy from <code>main</code>.
-        Documentation in <a href="https://github.com/chife-mod/schaad-advisors-website/blob/main/03_docs/" target="_blank" rel="noopener">03_docs/</a>.
-      </div>
+  <h2 class="launcher__section-title">Project stages</h2>
+  <ol class="stage-track">
+    <li class="stage" data-status="done">
+      <div class="stage__index">01</div>
+      <div class="stage__name">Wireframe</div>
+      <div class="stage__progress"><span style="width: 100%"></span></div>
+      <div class="stage__status">Complete</div>
     </li>
-    <li class="activity-item">
-      <span class="activity-item__date">2026-04-26 · 13:30</span>
-      <div class="activity-item__title">Hero direction frozen</div>
-      <div class="activity-item__desc">
-        Editorial Master + smart entrance, consolidated from GPT, Gemini and the discussion with Oleg. Hero copy stays 1:1 with the wireframe — no rewriting.
-        Cursor-reactive effect deferred to the next iteration.
-      </div>
+    <li class="stage" data-status="active">
+      <div class="stage__index">02</div>
+      <div class="stage__name">Design</div>
+      <div class="stage__progress"><span style="width: 5%"></span></div>
+      <div class="stage__status">5% — Hero in progress</div>
     </li>
-    <li class="activity-item">
-      <span class="activity-item__date">2026-04-26 · 13:00</span>
-      <div class="activity-item__title">Typography: Inter Variable, single-family</div>
-      <div class="activity-item__desc">
-        Playfair Display and any serif heading rejected — the client themselves dropped Playfair from the business card. Inter preserves identity consistency with the already-approved card.
-      </div>
+    <li class="stage" data-status="pending">
+      <div class="stage__index">03</div>
+      <div class="stage__name">Front-end</div>
+      <div class="stage__progress"><span style="width: 0%"></span></div>
+      <div class="stage__status">Pending</div>
     </li>
-    <li class="activity-item">
-      <span class="activity-item__date">2026-04-26 · 12:00</span>
-      <div class="activity-item__title">Technical stack frozen</div>
-      <div class="activity-item__desc">
-        Custom hybrid classic WP theme + ACF Pro Blocks + CPT for Lesezeichen + vanilla CSS + Vite + GSAP. Decided after consultation with Codex.
-      </div>
+    <li class="stage" data-status="pending">
+      <div class="stage__index">04</div>
+      <div class="stage__name">Back-end</div>
+      <div class="stage__progress"><span style="width: 0%"></span></div>
+      <div class="stage__status">Pending</div>
     </li>
-    <li class="activity-item">
-      <span class="activity-item__date">2026-04-26 · 10:30</span>
-      <div class="activity-item__title">Project kickoff</div>
-      <div class="activity-item__desc">
-        Input materials received: HTML wireframe, brand logo, Jakob's portraits, business card mockups. Audience, goals and tone captured in the brief.
-      </div>
+    <li class="stage" data-status="pending">
+      <div class="stage__index">05</div>
+      <div class="stage__name">Testing</div>
+      <div class="stage__progress"><span style="width: 0%"></span></div>
+      <div class="stage__status">Pending</div>
     </li>
-  </ul>
+  </ol>
 
   <dl class="launcher__meta">
     <div class="launcher__meta-block">
