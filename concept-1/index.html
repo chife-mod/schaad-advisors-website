@@ -5,22 +5,173 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Schaad Advisors · Concept 1</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23116490'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='42' fill='white'%3ES%3C/text%3E%3C/svg%3E">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/service-menu.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="concept-placeholder">
-  <span class="concept-placeholder__tag">Concept 1 · Work in progress</span>
-  <h1 class="concept-placeholder__title">Hero is being assembled.</h1>
-  <p class="concept-placeholder__text">
-    Editorial Master composition + smart entrance.<br>
-    First commit pushes the scaffold; Hero block follows in the next iteration.
-  </p>
-  <a class="concept-placeholder__link" href="../">← Back to launcher</a>
-</div>
+<!--
+  Hero V1 — pixel-perfect from Figma node 34:22 (updated)
+  Artboard: 1440 × 800
+  Rectangles: all spaced 8px apart, no overlap.
+  Nav h=40, Kontakt h=40, text-block bottom 48px from artboard bottom.
+-->
+<section class="hero">
+
+  <!-- Logo · x=80 y=0 w=328 h=205 -->
+  <a class="hero__logo" href="../" aria-label="Schaad Advisors">
+    <img src="../assets/LogoBig.svg" alt="Schaad Advisors">
+  </a>
+
+  <!-- Nav · Frame 1 · x=845 y=24 w=515 h=40 -->
+  <nav class="hero__nav" aria-label="Hauptnavigation">
+    <a href="#" aria-current="page">Startseite</a>
+    <a href="#">Über mich</a>
+    <a href="#">Lesezeichen</a>
+    <a href="#" class="hero__nav-cta">Kontakt</a>
+    <span class="hero__nav-indicator" aria-hidden="true"></span>
+  </nav>
+
+  <!-- Hover rectangles · 187×221 · #d9d9d9 · 8px gap, no overlap -->
+  <div class="hero__rect" data-r="6" style="--x:-130;--y:225"><div class="hero__fill"></div></div>
+  <div class="hero__rect" data-r="2" style="--x:65;--y:283"><div class="hero__fill"></div></div>
+  <div class="hero__rect" data-r="3" style="--x:260;--y:216"><div class="hero__fill"></div></div>
+  <div class="hero__rect" data-r="4" style="--x:455;--y:266"><div class="hero__fill"></div></div>
+  <div class="hero__rect" data-r="5" style="--x:650;--y:192"><div class="hero__fill"></div></div>
+  <div class="hero__rect" data-r="7" style="--x:1259;--y:242"><div class="hero__fill"></div></div>
+  <div class="hero__rect" data-r="8" style="--x:1454;--y:326"><div class="hero__fill"></div></div>
+
+  <!-- Main rectangle · x=845 y=118 w=406 h=455 · #9b9b9b -->
+  <div class="hero__main"></div>
+
+  <!-- Tags row · x=80 y=546 -->
+  <ul class="hero__tags">
+    <li>Advocacy</li>
+    <li>Gov.&thinsp;Relations</li>
+    <li>Regulierung</li>
+    <li>Geopolitik</li>
+  </ul>
+
+  <!-- H1 · x=80 y=594 w=436 fs=56 fw=400 -->
+  <h1 class="hero__name">Dr. Jakob Schaad</h1>
+
+  <!-- Claim · x=80 y=686 fs=16 fw=400 -->
+  <p class="hero__claim">Wissen bündeln.<br>Interessen wahren.<br>Brücken bauen.</p>
+
+  <!-- Loc · x=299 y=686 w=64 fs=16 fw=400 -->
+  <div class="hero__loc">
+    <span>Zürich</span>
+    <span>Schweiz</span>
+    <span>2026</span>
+  </div>
+
+  <!-- Body · x=845 y=616 w=515 fs=26 fw=400 -->
+  <p class="hero__body">Ich begleite internationale Unternehmen, Verbände und Stiftungen in strategischen politischen Fragen. Ökonomisch fundiert und mit mehr als 30 Jahren Erfahrung.</p>
+
+</section>
+
+<!-- GSAP for hover-reveal rects + sliding nav underline -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script>
+/* ──────────────────────────────────────────────────────────────
+   Photo-strip: vertical-column hover → reveals dark fill
+   ──────────────────────────────────────────────────────────────*/
+(function () {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  const rects   = [...hero.querySelectorAll('.hero__rect')];
+  const timers  = new WeakMap();
+  let active    = null;
+  let columns   = [];
+  let heroLeft  = 0;
+
+  function buildColumns() {
+    const r = hero.getBoundingClientRect();
+    heroLeft = r.left;
+    columns = rects.map(rect => {
+      const rr = rect.getBoundingClientRect();
+      return { rect, left: rr.left - r.left, right: rr.right - r.left };
+    });
+  }
+
+  function rectAt(x) {
+    for (const c of columns) if (x >= c.left && x <= c.right) return c.rect;
+    return null;
+  }
+
+  function reveal(rect) {
+    const fill = rect.querySelector('.hero__fill');
+    clearTimeout(timers.get(rect));
+    gsap.killTweensOf(fill);
+    gsap.to(fill, { opacity: 1, duration: 0.5, ease: 'power2.out' });
+  }
+
+  function conceal(rect) {
+    const fill = rect.querySelector('.hero__fill');
+    const t = setTimeout(() => {
+      gsap.to(fill, { opacity: 0, duration: 0.8, ease: 'power2.inOut' });
+    }, 600);
+    timers.set(rect, t);
+  }
+
+  buildColumns();
+  window.addEventListener('resize', buildColumns);
+
+  hero.addEventListener('mousemove', e => {
+    const x = e.clientX - heroLeft;
+    const next = rectAt(x);
+    if (next !== active) {
+      if (active) conceal(active);
+      if (next)   reveal(next);
+      active = next;
+    }
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    if (active) conceal(active);
+    active = null;
+  });
+})();
+
+/* ──────────────────────────────────────────────────────────────
+   Nav: sliding blue indicator. Default sits under [aria-current],
+   slides under the hovered link, returns on mouse-leave.
+   ──────────────────────────────────────────────────────────────*/
+(function () {
+  const nav  = document.querySelector('.hero__nav');
+  if (!nav) return;
+  const ind  = nav.querySelector('.hero__nav-indicator');
+  if (!ind) return;
+  const links = [...nav.querySelectorAll('a:not(.hero__nav-cta)')];
+  const active = nav.querySelector('a[aria-current="page"]');
+
+  function place(target, animated) {
+    if (!target) return;
+    const navRect = nav.getBoundingClientRect();
+    const r       = target.getBoundingClientRect();
+    const x       = r.left - navRect.left;
+    if (animated) {
+      gsap.to(ind, { x, duration: 0.4, ease: 'power3.out' });
+    } else {
+      gsap.set(ind, { x });
+    }
+  }
+
+  // Initial position under active link
+  function init() { place(active, false); }
+  init();
+  window.addEventListener('resize', init);
+
+  links.forEach(a => {
+    a.addEventListener('mouseenter', () => place(a, true));
+  });
+  nav.addEventListener('mouseleave', () => place(active, true));
+})();
+</script>
 
 <script defer src="../shared/service-menu.js"></script>
 </body>
