@@ -1,0 +1,387 @@
+/*
+ * Concept 2 — Schaad Advisors · "Private banking" hero
+ * Pixel-perfect from Figma node 42:430 · Artboard 1440 × 800.
+ *
+ *   Layout strategy:
+ *   - Hero is 100vw × 100vh (min 800), dark navy bg.
+ *   - Header (logo / nav / Kontakt button) anchored to TOP of viewport.
+ *   - Jakob portrait + service rings + text blocks anchored to BOTTOM
+ *     of viewport. The bottom of the body paragraph (left) and the
+ *     bottom of the claim/loc row (right) align on the same baseline.
+ *   - --gutter horizontally centres a 1440-wide stage on viewport.
+ *   - All button heights = 40px (header Kontakt and bottom CTAs).
+ */
+
+:root {
+  --gutter: max(0px, calc((100vw - 1440px) / 2));
+
+  --bg-deep:   #072634;            /* Figma rgb(7,38,52) */
+  --blue:      #116490;            /* brand */
+  --blue-dark: #0d4f72;
+  --white:     #ffffff;
+
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Reset ─────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; }
+html { font-family: var(--font); -webkit-font-smoothing: antialiased; }
+body {
+  background: var(--bg-deep);
+  color: var(--white);
+  overflow-x: hidden;
+}
+a   { text-decoration: none; color: inherit; }
+ul  { list-style: none; }
+img { display: block; max-width: 100%; }
+
+/* ─── Hero stage ────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: max(800px, 100vh);
+  background:
+    url('../assets/images/06.webp') center / cover no-repeat,
+    var(--bg-deep);
+  overflow: hidden;
+  color: var(--white);
+}
+
+/* ─── Logo · TOP anchor · Figma x=80 y=0 w=328 h=205 ────────── */
+
+.hero__logo {
+  position: absolute;
+  left: calc(var(--gutter) + 80px);
+  top:  0;
+  width:  328px;
+  height: 205px;
+  z-index: 10;
+}
+.hero__logo img { display: block; width: 100%; height: 100%; }
+
+/* ─── Nav · TOP anchor · Figma x=546 y=22 w=348 h=46 ────────── */
+
+.hero__nav {
+  position: absolute;
+  left: calc(var(--gutter) + 546px);
+  top:  22px;
+  width:  348px;
+  height: 46px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  z-index: 10;
+}
+
+.hero__nav a {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  height: 46px;
+  padding-top: 13px;
+  font-size:      14px;
+  line-height:    14px;
+  font-weight:    400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #ffffff;            /* explicit — pure white */
+  white-space: nowrap;
+  transition: opacity 220ms ease;
+}
+.hero__nav a:hover { opacity: 0.65; }
+
+/* Sliding indicator — 40×4 blue, anchored to bottom of nav row */
+.hero__nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 38px;                /* nav text bottom (35+14=49 wait... see Figma:
+                               text y=35, h=14 → bottom 49 in 46-tall nav
+                               container that's offset by 22 — so absolute
+                               y=49+22=71 in artboard. Underline (Rectangle 9)
+                               y=64 in artboard → relative to nav top 22:
+                               64-22 = 42. Use top:38 for a 4px-thick bar
+                               that ends at 42. */
+  width: 40px;
+  height: 4px;
+  background: var(--blue);
+  pointer-events: none;
+}
+
+/* ─── Kontakt button · TOP anchor · x=1258 y=28 w=102 h=40 ─── */
+
+.hero__nav-cta {
+  position: absolute;
+  left: calc(var(--gutter) + 1258px);
+  top:  28px;
+  width:  102px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue);
+  color: var(--white) !important;
+  font-size:      14px;
+  font-weight:    400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  border-radius: 3px;
+  z-index: 10;
+  transition: background 200ms ease;
+}
+.hero__nav-cta:hover { background: var(--blue-dark); }
+
+/* ─── Jakob portrait · BOTTOM anchor · cut-out fills lower zone ───
+      Figma 568 / 88 / 537.5 / 713  — bottom of image at y=801
+      (essentially flush with hero bottom 800).                      */
+
+.hero__portrait {
+  position: absolute;
+  left: calc(var(--gutter) + 568px);
+  bottom: 0;
+  width:  538px;
+  height: 713px;
+  z-index: 4;
+  pointer-events: none;
+  will-change: filter;
+}
+.hero__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* ─── Left text block · BOTTOM anchor ────────────────────────
+      Figma:
+        H1     y=299, h=56  → bottom-from-artboard = 800-355 = 445
+        body   y=379, h=84  → bottom-from-artboard = 800-463 = 337
+        CTAs   y=503, h=40  → bottom-from-artboard = 800-543 = 257
+      So if we anchor the WHOLE block at bottom: 257 (CTAs flush bottom)
+      and stack contents column-up from there, body bottom lands at 337,
+      H1 bottom at 445. Internal margins give the Figma gaps.            */
+
+.hero__lead {
+  position: absolute;
+  left:  calc(var(--gutter) + 80px);
+  bottom: 257px;            /* CTAs row bottom matches Figma y=543 */
+  width: 436px;
+  z-index: 5;
+}
+
+.hero__name {
+  font-size:      56px;
+  line-height:    56px;
+  font-weight:    400;
+  letter-spacing: -0.005em;
+  color: var(--white);
+  white-space: nowrap;
+  margin-bottom: 24px;          /* gap H1→body : 379-(299+56)=24 */
+}
+
+.hero__body {
+  width: 338px;
+  font-size:      16px;
+  line-height:    21px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--white);
+  margin-bottom: 40px;          /* gap body→CTAs : 503-(379+84)=40 */
+}
+
+/* ─── CTA button row · h=40 · gap=8 (Figma: 282-(80+194)=8) ── */
+
+.hero__ctas { display: flex; gap: 8px; }
+
+.hero__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;                 /* explicit — matches header Kontakt */
+  padding: 0 18px;
+  font-size:      14px;
+  line-height:    14px;
+  font-weight:    400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: 3px;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.hero__btn--primary {
+  width: 194px;
+  background: var(--blue);
+  color: var(--white) !important;
+}
+.hero__btn--primary:hover { background: var(--blue-dark); }
+
+.hero__btn--ghost {
+  width: 114px;
+  background: transparent;
+  color: var(--white) !important;
+  border: 1px solid var(--blue);
+}
+.hero__btn--ghost:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+/* ─── Right text block · BOTTOM anchor (same baseline as body) ───
+      Figma:
+        Signature  y=318, h=58 → bottom = 376
+        Claim/Loc  y=400, h=63 → bottom = 463 (= body bottom)
+      Anchor block bottom at 337px (same as body bottom-from-artboard).
+      Inside, claim/loc sit at the bottom; signature stacks above with a
+      24px margin (400-(318+58)=24).                                      */
+
+.hero__right {
+  position: absolute;
+  left:  calc(var(--gutter) + 1048px);
+  bottom: 337px;                /* matches body bottom (Figma y=463) */
+  width: 312px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero__signature {
+  display: block;
+  width: 312px;                 /* Signature 1 in Figma is 312×58 */
+  height: auto;
+  margin-bottom: 24px;          /* gap signature→claim row */
+  /* Image is white-on-transparent; stays crisp on dark bg. */
+}
+
+.hero__claim-row {
+  display: flex;
+  gap: 75px;                    /* 219-144 = 75 between claim and loc */
+  padding-left: 29px;           /* Figma: Frame 9 inset 29px inside Frame 27 */
+}
+
+.hero__claim {
+  width: 144px;
+  font-size:      16px;
+  line-height:    21px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.hero__loc {
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+}
+.hero__loc span {
+  font-size:      16px;
+  line-height:    21px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--white);
+}
+
+/* ─── Service rings strip · bottom: -70 (rings bleed below) ───
+      Figma Frame 26 · 1600×400 · y=470, extends 70px below 800-tall
+      artboard. Anchoring to bottom: -70px reproduces the bleed on any
+      viewport height — rings always sit relative to viewport bottom.
+      Each child is a 400×400 cell; rings/labels positioned within.   */
+
+.hero__services {
+  position: absolute;
+  left: calc(var(--gutter) - 80px);
+  bottom: -70px;
+  width:  1600px;
+  height:  400px;
+  z-index: 3;
+  pointer-events: none;          /* children re-enable */
+}
+
+.hero__service {
+  position: absolute;
+  top: 0;
+  width:  400px;
+  height: 400px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hero__service:nth-child(1) { left:    0px; }
+.hero__service:nth-child(2) { left:  400px; }
+.hero__service:nth-child(3) { left:  800px; }
+.hero__service:nth-child(4) { left: 1200px; }
+
+/* SVG ring — sized via --r (radius in px), centred at frame mid */
+
+.hero__service-ring {
+  position: absolute;
+  left: calc(var(--cx) * 1px - var(--r) * 1px);
+  top:  calc(var(--cy) * 1px - var(--r) * 1px);
+  width:  calc(var(--r) * 2 * 1px);
+  height: calc(var(--r) * 2 * 1px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Photo overlay clipped to the ring shape (same circle math).
+   Hidden by default; opacity tween on hover.                  */
+
+.hero__service-photo {
+  position: absolute;
+  left: calc(var(--cx) * 1px - var(--r) * 1px);
+  top:  calc(var(--cy) * 1px - var(--r) * 1px);
+  width:  calc(var(--r) * 2 * 1px);
+  height: calc(var(--r) * 2 * 1px);
+  border-radius: 50%;
+  background: center / cover no-repeat;
+  filter: grayscale(0.25) brightness(0.85) contrast(0.95);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Plus mark — sits in the arc gap (Figma vector positions per cell) */
+
+.hero__service-plus {
+  position: absolute;
+  left: calc(var(--plus-x) * 1px);
+  top:  calc(var(--plus-y) * 1px);
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--white);
+  font-weight: 300;
+  background: var(--bg-deep);    /* mask the ring underneath where + sits */
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Service tag text — y=193 inside the 400 frame (Figma) · fs=14 */
+
+.hero__service-label {
+  position: absolute;
+  top: 193px;
+  left: calc(var(--label-x) * 1px);
+  font-size:      14px;
+  line-height:    14px;
+  font-weight:    400;
+  letter-spacing: 0;
+  color: var(--white);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 220ms ease;
+}
+
+/* ─── Reduced motion ────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

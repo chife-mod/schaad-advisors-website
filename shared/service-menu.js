@@ -21,6 +21,12 @@
       path: "",
     },
     {
+      id: "concept-2",
+      label: "Concept 2",
+      desc: "Private banking · centred portrait + service rings",
+      path: "concept-2/",
+    },
+    {
       id: "concept-1",
       label: "Concept 1",
       desc: "Hybrid hero · random photo-strip + mouse priority",
@@ -34,9 +40,7 @@
     },
   ];
 
-  // The default concept — shown in the pill on the launcher page so the
-  // user lands one click away from the live preview.
-  const DEFAULT_VERSION_ID = "concept-1";
+  const DEFAULT_VERSION_ID = "concept-2";
 
   // Detect base URL by locating this script's <script> tag.
   function detectBase() {
