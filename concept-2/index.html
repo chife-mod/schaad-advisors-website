@@ -367,7 +367,8 @@
     const next = rectAt(x);
     if (next !== active) {
       if (active) conceal(active, { fadeOut: M_FADE_OUT, ease: M_FADE_OUT_EZ, delay: M_LEAVE_HOLD });
-      if (next)   reveal(next,   { fadeIn:  M_FADE_IN, ease: M_FADE_IN_EZ, y: null });
+      // Mouse hover also randomises Y — every reveal is a fresh height.
+      if (next)   reveal(next,   { fadeIn:  M_FADE_IN, ease: M_FADE_IN_EZ, y: randomY() });
       active = next;
     }
   });

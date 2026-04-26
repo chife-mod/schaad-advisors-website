@@ -21,12 +21,6 @@
       path: "",
     },
     {
-      id: "concept-3",
-      label: "Concept 3",
-      desc: "Cursor as aperture — depth-of-field photography",
-      path: "concept-3/",
-    },
-    {
       id: "concept-2",
       label: "Concept 2",
       desc: "Hybrid: random photo-strip + mouse priority",
@@ -48,7 +42,7 @@
 
   // The "default" / latest concept — shown in the pill when the user is
   // on the launcher page (so they can jump straight to the newest preview).
-  const DEFAULT_VERSION_ID = "concept-3";
+  const DEFAULT_VERSION_ID = "concept-2";
 
   // Detect base URL by locating this script's <script> tag.
   function detectBase() {
