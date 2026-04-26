@@ -14,10 +14,11 @@
 <body>
 
 <!--
-  Hero V1 — pixel-perfect from Figma node 34:22 (updated)
-  Artboard: 1440 × 800
-  Rectangles: all spaced 8px apart, no overlap.
-  Nav h=40, Kontakt h=40, text-block bottom 48px from artboard bottom.
+  Hero V1 — pixel-perfect from Figma node 34:22 (updated layout).
+  Real images live in /assets/images/C1_Hero_Slider/.
+  Main rect: Jacob_C1.jpg (always visible).
+  Hover rects: empty default, image fades in on cursor-column hover,
+  fades back to nothing on leave; each rect cycles through a shuffled deck.
 -->
 <section class="hero">
 
@@ -35,17 +36,19 @@
     <span class="hero__nav-indicator" aria-hidden="true"></span>
   </nav>
 
-  <!-- Hover rectangles · 187×221 · #d9d9d9 · 8px gap, no overlap -->
-  <div class="hero__rect" data-r="6" style="--x:-130;--y:225"><div class="hero__fill"></div></div>
-  <div class="hero__rect" data-r="2" style="--x:65;--y:283"><div class="hero__fill"></div></div>
-  <div class="hero__rect" data-r="3" style="--x:260;--y:216"><div class="hero__fill"></div></div>
-  <div class="hero__rect" data-r="4" style="--x:455;--y:266"><div class="hero__fill"></div></div>
-  <div class="hero__rect" data-r="5" style="--x:650;--y:192"><div class="hero__fill"></div></div>
-  <div class="hero__rect" data-r="7" style="--x:1259;--y:242"><div class="hero__fill"></div></div>
-  <div class="hero__rect" data-r="8" style="--x:1454;--y:326"><div class="hero__fill"></div></div>
+  <!-- Hover rectangles · 187×221 · 8px gap, no overlap -->
+  <div class="hero__rect" data-r="6" style="--x:-130;--y:225"><img class="hero__rect-img" alt=""></div>
+  <div class="hero__rect" data-r="2" style="--x:65;--y:283"><img class="hero__rect-img" alt=""></div>
+  <div class="hero__rect" data-r="3" style="--x:260;--y:216"><img class="hero__rect-img" alt=""></div>
+  <div class="hero__rect" data-r="4" style="--x:455;--y:266"><img class="hero__rect-img" alt=""></div>
+  <div class="hero__rect" data-r="5" style="--x:650;--y:192"><img class="hero__rect-img" alt=""></div>
+  <div class="hero__rect" data-r="7" style="--x:1259;--y:242"><img class="hero__rect-img" alt=""></div>
+  <div class="hero__rect" data-r="8" style="--x:1454;--y:326"><img class="hero__rect-img" alt=""></div>
 
-  <!-- Main rectangle · x=845 y=118 w=406 h=455 · #9b9b9b -->
-  <div class="hero__main"></div>
+  <!-- Main rectangle · x=845 y=118 w=406 h=455 · Jakob portrait -->
+  <div class="hero__main">
+    <img src="../assets/images/C1_Hero_Slider/Jacob_C1.jpg" alt="Dr. Jakob Schaad">
+  </div>
 
   <!-- Tags row · x=80 y=546 -->
   <ul class="hero__tags">
@@ -73,21 +76,82 @@
 
 </section>
 
-<!-- GSAP for hover-reveal rects + sliding nav underline -->
+<!-- GSAP for hover-reveal photos + sliding nav underline -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
 /* ──────────────────────────────────────────────────────────────
-   Photo-strip: vertical-column hover → reveals dark fill
+   Photo-strip: vertical-column hover. Empty default → image fades
+   in (0.5s power2.out) → 600ms hold after leave → fades to empty
+   (0.8s power2.inOut). Each rect has its own shuffled deck;
+   on each fully-completed cycle a new image is drawn.
    ──────────────────────────────────────────────────────────────*/
 (function () {
   const hero = document.querySelector('.hero');
   if (!hero) return;
 
-  const rects   = [...hero.querySelectorAll('.hero__rect')];
-  const timers  = new WeakMap();
-  let active    = null;
-  let columns   = [];
-  let heroLeft  = 0;
+  const POOL = [
+    '01.png', '02.png', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.jpg',
+    '08.jpg', '09.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg',
+    '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg', '20.jpg'
+  ].map(n => `../assets/images/C1_Hero_Slider/${n}`);
+
+  // Preload everything so hover-reveal is instantaneous.
+  POOL.forEach(src => { const i = new Image(); i.src = src; });
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const rects     = [...hero.querySelectorAll('.hero__rect')];
+  const timers    = new WeakMap();
+  const rectSrc   = new WeakMap();   // rect → currently-mounted src (null if hidden)
+
+  // Single global shuffled deck. Every rect draws from it.
+  // No image may appear in two rects simultaneously, and no image
+  // may be drawn twice in a row.
+  let deck       = shuffle(POOL);
+  let deckIdx    = 0;
+  let lastPicked = null;
+
+  function reshuffle() {
+    const lastItem = deck[deck.length - 1];
+    deck = shuffle(POOL);
+    // Ensure first new item ≠ last old item (anti-boundary-repeat)
+    if (deck[0] === lastItem && deck.length > 1) {
+      [deck[0], deck[1]] = [deck[1], deck[0]];
+    }
+    deckIdx = 0;
+  }
+
+  function isCurrentlyShown(src) {
+    for (const rect of rects) if (rectSrc.get(rect) === src) return true;
+    return false;
+  }
+
+  function nextSrc() {
+    // Walk the deck until we find a candidate that's neither
+    // currently shown elsewhere nor identical to the previous pick.
+    for (let safety = 0; safety < deck.length * 2; safety++) {
+      if (deckIdx >= deck.length) reshuffle();
+      const cand = deck[deckIdx++];
+      if (cand !== lastPicked && !isCurrentlyShown(cand)) {
+        lastPicked = cand;
+        return cand;
+      }
+    }
+    // Fallback — shouldn't reach with 20 images & ≤7 simultaneous
+    lastPicked = deck[deckIdx % deck.length];
+    return lastPicked;
+  }
+
+  let active   = null;
+  let columns  = [];
+  let heroLeft = 0;
 
   function buildColumns() {
     const r = hero.getBoundingClientRect();
@@ -104,16 +168,30 @@
   }
 
   function reveal(rect) {
-    const fill = rect.querySelector('.hero__fill');
+    const img = rect.querySelector('.hero__rect-img');
     clearTimeout(timers.get(rect));
-    gsap.killTweensOf(fill);
-    gsap.to(fill, { opacity: 1, duration: 0.5, ease: 'power2.out' });
+    gsap.killTweensOf(img);
+    // Only swap src if currently fully hidden — prevents image-snap
+    // when user re-hovers during fade-out (and avoids picking a new
+    // image when the same one is still partially visible).
+    const op = parseFloat(getComputedStyle(img).opacity) || 0;
+    if (op === 0) {
+      const src = nextSrc();
+      rectSrc.set(rect, src);
+      img.src = src;
+    }
+    gsap.to(img, { opacity: 1, duration: 0.5, ease: 'power2.out' });
   }
 
   function conceal(rect) {
-    const fill = rect.querySelector('.hero__fill');
+    const img = rect.querySelector('.hero__rect-img');
     const t = setTimeout(() => {
-      gsap.to(fill, { opacity: 0, duration: 0.8, ease: 'power2.inOut' });
+      gsap.to(img, {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        onComplete: () => rectSrc.set(rect, null)   // free the image globally
+      });
     }, 600);
     timers.set(rect, t);
   }
@@ -138,15 +216,15 @@
 })();
 
 /* ──────────────────────────────────────────────────────────────
-   Nav: sliding blue indicator. Default sits under [aria-current],
-   slides under the hovered link, returns on mouse-leave.
+   Nav: sliding 40×4 blue indicator. Slides under hovered link,
+   returns to active on mouse-leave.
    ──────────────────────────────────────────────────────────────*/
 (function () {
-  const nav  = document.querySelector('.hero__nav');
+  const nav = document.querySelector('.hero__nav');
   if (!nav) return;
-  const ind  = nav.querySelector('.hero__nav-indicator');
+  const ind = nav.querySelector('.hero__nav-indicator');
   if (!ind) return;
-  const links = [...nav.querySelectorAll('a:not(.hero__nav-cta)')];
+  const links  = [...nav.querySelectorAll('a:not(.hero__nav-cta)')];
   const active = nav.querySelector('a[aria-current="page"]');
 
   function place(target, animated) {
@@ -154,21 +232,15 @@
     const navRect = nav.getBoundingClientRect();
     const r       = target.getBoundingClientRect();
     const x       = r.left - navRect.left;
-    if (animated) {
-      gsap.to(ind, { x, duration: 0.4, ease: 'power3.out' });
-    } else {
-      gsap.set(ind, { x });
-    }
+    if (animated) gsap.to(ind, { x, duration: 0.4, ease: 'power3.out' });
+    else          gsap.set(ind, { x });
   }
 
-  // Initial position under active link
   function init() { place(active, false); }
   init();
   window.addEventListener('resize', init);
 
-  links.forEach(a => {
-    a.addEventListener('mouseenter', () => place(a, true));
-  });
+  links.forEach(a => a.addEventListener('mouseenter', () => place(a, true)));
   nav.addEventListener('mouseleave', () => place(active, true));
 })();
 </script>

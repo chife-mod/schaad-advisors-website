@@ -133,9 +133,10 @@ img { display: block; max-width: 100%; }
   opacity: 1;
 }
 
-/* ─── Hover rectangles · 187×221 · #d9d9d9 ──────────────────
-      All seven spaced 8px apart, no overlap.
-      Y already includes Figma y; --photo-shift is added.       */
+/* ─── Hover rectangles · 187×221 ────────────────────────────
+      Default: empty. On hover (vertical-column trigger) an image
+      fades in; on leave it fades back to nothing.
+      All seven rects spaced 8px apart, no overlap.              */
 
 .hero__rect {
   position: absolute;
@@ -143,20 +144,24 @@ img { display: block; max-width: 100%; }
   top:    calc(var(--y) * 1px + var(--photo-shift));
   width:  187px;
   height: 221px;
-  background: var(--rect-light);
+  background: transparent;
+  border-radius: 3px;
   overflow: hidden;
   z-index: 1;
 }
 
-.hero__fill {
+.hero__rect-img {
   position: absolute;
   inset: 0;
-  background: var(--rect-dark);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0;
   pointer-events: none;
+  display: block;
 }
 
-/* ─── Main rectangle · x=845 y=118 w=406 h=455 · #9b9b9b ──── */
+/* ─── Main rectangle · x=845 y=118 w=406 h=455 · Jakob portrait ── */
 
 .hero__main {
   position: absolute;
@@ -164,8 +169,17 @@ img { display: block; max-width: 100%; }
   top:    calc(118px + var(--photo-shift));
   width:  406px;
   height: 455px;
-  background: var(--rect-dark);
+  background: transparent;
+  border-radius: 3px;
+  overflow: hidden;
   z-index: 2;
+}
+
+.hero__main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* ─── Text block · anchored to viewport bottom (48px gap) ─── */
@@ -185,6 +199,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   background: var(--tag-bg);
+  border-radius: 3px;
   font-size:      12px;
   line-height:    15.6px;
   font-weight:    400;
