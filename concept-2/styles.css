@@ -124,6 +124,7 @@ img { display: block; max-width: 100%; }
   background: var(--blue);
   color: var(--white) !important;
   font-size:      14px;
+  line-height:    14px;
   font-weight:    400;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -191,16 +192,19 @@ img { display: block; max-width: 100%; }
   margin-bottom: 40px;          /* gap body→CTAs : 503-(379+84)=40 */
 }
 
-/* ─── CTA button row · h=40 · gap=8 (Figma: 282-(80+194)=8) ── */
+/* ─── CTA button row · h=40 · gap=8 (Figma: 282-(80+194)=8) ───
+      Both bottom buttons share the EXACT same styling as the top
+      Kontakt button (filled blue, white text). Only widths differ.   */
 
 .hero__ctas { display: flex; gap: 8px; }
 
 .hero__btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;                 /* explicit — matches header Kontakt */
-  padding: 0 18px;
+  height: 40px;
+  background: var(--blue);
+  color: var(--white) !important;
   font-size:      14px;
   line-height:    14px;
   font-weight:    400;
@@ -208,26 +212,13 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
   white-space: nowrap;
   border-radius: 3px;
-  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+  border: 0;
+  transition: background 200ms ease;
 }
+.hero__btn:hover { background: var(--blue-dark); }
 
-.hero__btn--primary {
-  width: 194px;
-  background: var(--blue);
-  color: var(--white) !important;
-}
-.hero__btn--primary:hover { background: var(--blue-dark); }
-
-.hero__btn--ghost {
-  width: 114px;
-  background: transparent;
-  color: var(--white) !important;
-  border: 1px solid var(--blue);
-}
-.hero__btn--ghost:hover {
-  background: var(--blue);
-  border-color: var(--blue);
-}
+.hero__btn--primary { width: 194px; }
+.hero__btn--ghost   { width: 114px; }
 
 /* ─── Right text block · BOTTOM anchor (same baseline as body) ───
       Figma:
