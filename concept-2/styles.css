@@ -37,6 +37,45 @@ a   { text-decoration: none; color: inherit; }
 ul  { list-style: none; }
 img { display: block; max-width: 100%; }
 
+/* ─── Entrance animation ─────────────────────────────────────
+   fill-mode: backwards  → element starts at "from" state BEFORE
+   animation begins (during delay), so it's already hidden.
+   fill-mode does NOT lock the final state, so CSS transitions
+   (e.g. nav hover opacity) work normally once animation ends.   */
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Fade-only — for elements that have JS-set transform (indicator) */
+@keyframes hero-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Shared shorthand: duration ease delay fill-mode */
+.hero__logo     { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.10s backwards; }
+.hero__nav-cta  { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.15s backwards; }
+.hero__portrait { animation: hero-rise 1.1s cubic-bezier(0.23,1,0.32,1) 0.40s backwards; }
+.hero__name     { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.55s backwards; }
+.hero__body     { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.55s backwards; }
+.hero__signature{ animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.55s backwards; }
+.hero__claim    { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.55s backwards; }
+.hero__loc      { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.55s backwards; }
+.hero__ctas     { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.75s backwards; }
+
+/* Nav links — staggered, explicit white color, NO inherit to avoid :visited flash */
+.hero__nav a:nth-child(1) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.15s backwards; }
+.hero__nav a:nth-child(2) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.21s backwards; }
+.hero__nav a:nth-child(3) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.27s backwards; }
+
+/* Service rings — staggered */
+.hero__service:nth-child(1) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.80s backwards; }
+.hero__service:nth-child(2) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.87s backwards; }
+.hero__service:nth-child(3) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.94s backwards; }
+.hero__service:nth-child(4) { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 1.01s backwards; }
+
 /* ─── Hero stage ────────────────────────────────────────────── */
 
 .hero {
@@ -76,18 +115,13 @@ img { display: block; max-width: 100%; }
   z-index: 10;
 }
 
-/* Nav must read white in every link-state. The trick is to set the
-   colour on the PARENT (.hero__nav) and inherit it on every <a>
-   pseudo-state — browsers allow `color: inherit` on :visited where
-   they normally restrict explicit colour values for privacy. */
+/* Nav links: explicit #ffffff on EVERY pseudo-state.
+   Both :link and :visited have the same value → no privacy leak,
+   browser renders white regardless of history. No color: inherit
+   to avoid the brief UA-default flash on :visited re-evaluation. */
 .hero__nav { color: #ffffff; }
 
-.hero__nav a,
-.hero__nav a:link,
-.hero__nav a:visited,
-.hero__nav a:hover,
-.hero__nav a:active,
-.hero__nav a:focus {
+.hero__nav a {
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -98,28 +132,34 @@ img { display: block; max-width: 100%; }
   font-weight:    400;
   letter-spacing: 0;
   text-transform: uppercase;
-  color: inherit;
   white-space: nowrap;
   text-decoration: none;
   transition: opacity 220ms ease;
+  color: #ffffff;
+}
+.hero__nav a:link,
+.hero__nav a:visited,
+.hero__nav a:hover,
+.hero__nav a:active,
+.hero__nav a:focus {
+  color: #ffffff;
 }
 .hero__nav a:hover { opacity: 0.65; }
 
-/* Sliding indicator — 40×4 blue, anchored to bottom of nav row */
+/* Sliding indicator — 40×4 blue, anchored to bottom of nav row.
+   hero-fade (opacity only) so the JS translateX never conflicts. */
 .hero__nav-indicator {
   position: absolute;
   left: 0;
-  top: 38px;                /* nav text bottom (35+14=49 wait... see Figma:
-                               text y=35, h=14 → bottom 49 in 46-tall nav
-                               container that's offset by 22 — so absolute
-                               y=49+22=71 in artboard. Underline (Rectangle 9)
-                               y=64 in artboard → relative to nav top 22:
-                               64-22 = 42. Use top:38 for a 4px-thick bar
-                               that ends at 42. */
+  top: 38px;                /* nav text bottom; underline at Figma y=64
+                               relative to nav top 22: 64-22 = 42.
+                               Use top:38 for 4px bar ending at 42. */
   width: 40px;
   height: 4px;
   background: var(--blue);
   pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: hero-fade 0.35s ease 0.35s backwards;
 }
 
 /* ─── Kontakt button · TOP anchor · x=1258 y=28 w=102 h=40 ─── */
@@ -164,13 +204,18 @@ img { display: block; max-width: 100%; }
   height: 713px;
   z-index: 3;                     /* sits BEHIND service rings */
   pointer-events: none;
-  will-change: filter;
 }
 .hero__portrait img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   object-position: center bottom;
+  will-change: filter;
+  transition: filter 0.9s ease-in-out;
+}
+/* JS toggles this class when any service ring is hovered */
+.hero__portrait img.hero__portrait-img--blur {
+  filter: blur(2.5px);
 }
 
 /* ─── Left text block · BOTTOM anchor ────────────────────────
@@ -187,7 +232,7 @@ img { display: block; max-width: 100%; }
   left:  calc(var(--gutter) + 80px);
   bottom: 257px;            /* CTAs row bottom matches Figma y=543 */
   width: 436px;
-  z-index: 5;
+  z-index: 7;               /* above service rings (z=6) */
 }
 
 .hero__name {
@@ -210,19 +255,15 @@ img { display: block; max-width: 100%; }
   margin-bottom: 40px;          /* gap body→CTAs : 503-(379+84)=40 */
 }
 
-/* ─── CTA button row · h=40 · gap=8 (Figma: 282-(80+194)=8) ───
-      Both bottom buttons share the EXACT same styling as the top
-      Kontakt button (filled blue, white text). Only widths differ.   */
+/* ─── CTA button row · h=40 · gap=8 (Figma: 282-(80+194)=8) ── */
 
 .hero__ctas { display: flex; gap: 8px; }
 
 .hero__btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 40px;
-  background: var(--blue);
-  color: var(--white) !important;
   font-size:      14px;
   line-height:    14px;
   font-weight:    400;
@@ -230,13 +271,30 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
   white-space: nowrap;
   border-radius: 3px;
-  border: 0;
-  transition: background 200ms ease;
+  text-decoration: none;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
 }
-.hero__btn:hover { background: var(--blue-dark); }
 
-.hero__btn--primary { width: 194px; }
-.hero__btn--ghost   { width: 114px; }
+/* Primary — filled blue, same as header Kontakt */
+.hero__btn--primary {
+  width: 194px;
+  background: var(--blue);
+  color: var(--white);
+  border: 1px solid transparent;
+}
+.hero__btn--primary:hover { background: var(--blue-dark); }
+
+/* Ghost — outlined with brand blue border, transparent bg */
+.hero__btn--ghost {
+  width: 114px;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid var(--blue);
+}
+.hero__btn--ghost:hover {
+  background: rgba(17, 100, 144, 0.18);
+  border-color: var(--blue);
+}
 
 /* ─── Right text block · BOTTOM anchor (same baseline as body) ───
       Figma:
@@ -251,7 +309,7 @@ img { display: block; max-width: 100%; }
   left:  calc(var(--gutter) + 1048px);
   bottom: 337px;                /* matches body bottom (Figma y=463) */
   width: 312px;
-  z-index: 5;
+  z-index: 7;               /* above service rings (z=6) */
   display: flex;
   flex-direction: column;
 }
@@ -293,73 +351,72 @@ img { display: block; max-width: 100%; }
   color: var(--white);
 }
 
-/* ─── Service rings strip · bottom: -70 (rings bleed below) ───
-      Figma Frame 26 · 1600×400 · y=470, extends 70px below 800-tall
-      artboard. Anchoring to bottom: -70px reproduces the bleed on any
-      viewport height — rings always sit relative to viewport bottom.
-      Each child is a 400×400 cell; rings/labels positioned within.   */
+/* ─── Service rings strip · responsive 4 × 25vw grid ───────────
+      Rings fill their cell exactly → tangent (edge-to-edge, no overlap).
+      vector-effect="non-scaling-stroke" keeps stroke at 1px device-px.
+      Strip anchored bottom:-70px so rings bleed below viewport edge.  */
 
 .hero__services {
   position: absolute;
-  left: calc(var(--gutter) - 80px);
+  left:   0;
   bottom: -70px;
-  width:  1600px;
-  height:  400px;
-  z-index: 6;                    /* in front of Jakob */
-  pointer-events: none;          /* children re-enable */
+  width:  100vw;
+  height: 25vw;
+  display: grid;
+  grid-template-columns: repeat(4, 25vw);
+  z-index: 6;
+  pointer-events: none;
 }
 
 .hero__service {
-  position: absolute;
-  top: 0;
-  width:  400px;
-  height: 400px;
+  position: relative;
+  width:  25vw;
+  height: 25vw;
   pointer-events: auto;
   cursor: pointer;
 }
 
-.hero__service:nth-child(1) { left:    0px; }
-.hero__service:nth-child(2) { left:  400px; }
-.hero__service:nth-child(3) { left:  800px; }
-.hero__service:nth-child(4) { left: 1200px; }
-
-/* SVG ring — sized via --r (radius in px), centred at frame mid */
+/* Ring SVG fills the cell; stroke stays 1px via non-scaling-stroke */
 
 .hero__service-ring {
   position: absolute;
-  left: calc(var(--cx) * 1px - var(--r) * 1px);
-  top:  calc(var(--cy) * 1px - var(--r) * 1px);
-  width:  calc(var(--r) * 2 * 1px);
-  height: calc(var(--r) * 2 * 1px);
+  inset: 0;
+  width:  100%;
+  height: 100%;
+  overflow: visible;
   pointer-events: none;
   z-index: 1;
 }
 
-/* Photo overlay clipped to the ring shape (same circle math).
-   Hidden by default; opacity tween on hover.                  */
+/* Photo overlay — same circle as the ring */
 
 .hero__service-photo {
   position: absolute;
-  left: calc(var(--cx) * 1px - var(--r) * 1px);
-  top:  calc(var(--cy) * 1px - var(--r) * 1px);
-  width:  calc(var(--r) * 2 * 1px);
-  height: calc(var(--r) * 2 * 1px);
+  inset: 0;
+  width:  100%;
+  height: 100%;
   border-radius: 50%;
   background: center / cover no-repeat;
   filter: grayscale(0.25) brightness(0.85) contrast(0.95);
   opacity: 0;
   pointer-events: none;
   z-index: 0;
+  transition: opacity 0.9s ease-in-out;
+}
+.hero__service:hover .hero__service-photo {
+  opacity: 0.9;
+  transition: opacity 0.7s ease-out;
 }
 
-/* Plus mark — sits in the arc gap (Figma vector positions per cell) */
+/* Plus mark — percentage position in the arc gap via --plus-x/y-pct */
 
 .hero__service-plus {
   position: absolute;
-  left: calc(var(--plus-x) * 1px);
-  top:  calc(var(--plus-y) * 1px);
-  width: 12px;
-  height: 12px;
+  left: var(--plus-x-pct, 5%);
+  top:  var(--plus-y-pct, 70%);
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,26 +424,27 @@ img { display: block; max-width: 100%; }
   line-height: 1;
   color: var(--white);
   font-weight: 300;
-  background: var(--bg-deep);    /* mask the ring underneath where + sits */
+  background: var(--bg-deep);
   z-index: 2;
   pointer-events: none;
 }
 
-/* Service tag text — y=193 inside the 400 frame (Figma) · fs=14 */
+/* Service label — centered horizontally at ring equator (≈48% height) */
 
 .hero__service-label {
   position: absolute;
-  top: 193px;
-  left: calc(var(--label-x) * 1px);
+  top: 48.25%;
+  left: 50%;
+  transform: translateX(-50%);
   font-size:      14px;
   line-height:    14px;
   font-weight:    400;
   letter-spacing: 0;
+  text-transform: uppercase;
   color: var(--white);
   white-space: nowrap;
   pointer-events: none;
   z-index: 2;
-  transition: opacity 220ms ease;
 }
 
 /* ─── Reduced motion ────────────────────────────────────────── */

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/service-menu.css">
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 
@@ -73,56 +73,60 @@
     </div>
   </div>
 
-  <!-- ── Service rings strip · bottom: -70 (rings bleed below) ── -->
+  <!-- ── Service rings strip · 4 × 25vw responsive cells ── -->
   <ul class="hero__services">
 
     <li class="hero__service" data-service="advocacy"
-        style="--frame-x:0;--cx:200;--cy:200;--r:271;--gap-rot:155.6deg;--label-x:161;--plus-x:17;--plus-y:283">
+        style="--plus-x-pct:5%;--plus-y-pct:72%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/03.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 542 542" aria-hidden="true">
-        <circle cx="271" cy="271" r="270.5" fill="none"
+      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="49.5" fill="none"
                 stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"
                 pathLength="1000" stroke-dasharray="985 15"
-                transform="rotate(155.6 271 271)"/>
+                transform="rotate(155.6 50 50)"/>
       </svg>
       <span class="hero__service-plus" aria-hidden="true">+</span>
       <span class="hero__service-label">Advocacy</span>
     </li>
 
     <li class="hero__service" data-service="gov"
-        style="--frame-x:400;--cx:200;--cy:200;--r:271;--gap-rot:-73deg;--label-x:143.5;--plus-x:259;--plus-y:7">
+        style="--plus-x-pct:62%;--plus-y-pct:2%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/05.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 542 542" aria-hidden="true">
-        <circle cx="271" cy="271" r="270.5" fill="none"
+      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="49.5" fill="none"
                 stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"
                 pathLength="1000" stroke-dasharray="985 15"
-                transform="rotate(-73 271 271)"/>
+                transform="rotate(-73 50 50)"/>
       </svg>
       <span class="hero__service-plus" aria-hidden="true">+</span>
       <span class="hero__service-label">Gov.&thinsp;Relations</span>
     </li>
 
     <li class="hero__service" data-service="reg"
-        style="--frame-x:800;--cx:200;--cy:200;--r:271;--gap-rot:155.6deg;--label-x:143.5;--plus-x:17;--plus-y:283">
+        style="--plus-x-pct:5%;--plus-y-pct:72%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/07.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 542 542" aria-hidden="true">
-        <circle cx="271" cy="271" r="270.5" fill="none"
+      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="49.5" fill="none"
                 stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"
                 pathLength="1000" stroke-dasharray="985 15"
-                transform="rotate(155.6 271 271)"/>
+                transform="rotate(155.6 50 50)"/>
       </svg>
       <span class="hero__service-plus" aria-hidden="true">+</span>
       <span class="hero__service-label">Regulierung</span>
     </li>
 
     <li class="hero__service" data-service="geo"
-        style="--frame-x:1200;--cx:200;--cy:200;--r:271;--gap-rot:210.4deg;--label-x:158.5;--plus-x:24;--plus-y:97">
+        style="--plus-x-pct:6%;--plus-y-pct:27%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/09.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 542 542" aria-hidden="true">
-        <circle cx="271" cy="271" r="270.5" fill="none"
+      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="49.5" fill="none"
                 stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"
                 pathLength="1000" stroke-dasharray="985 15"
-                transform="rotate(210.4 271 271)"/>
+                transform="rotate(210.4 50 50)"/>
       </svg>
       <span class="hero__service-plus" aria-hidden="true">+</span>
       <span class="hero__service-label">Geopolitik</span>
@@ -132,84 +136,56 @@
 
 </section>
 
-<!-- GSAP -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script>
-/* ──────────────────────────────────────────────────────────────
-   1. Quiet entrance: rise 16px + fade in. Three small staggers,
-      everything else simultaneous. power3.out, ≈0.9s.
-   ──────────────────────────────────────────────────────────────*/
+/* ── 1. Service hover: soft-blur Jakob when any ring is hovered ──*/
 (function () {
-  if (!window.gsap) return;
-  const RISE = { opacity: 0, y: 16, duration: 0.9, ease: 'power3.out' };
-  const tl   = gsap.timeline({ delay: 0.1 });
-
-  // Nav links are intentionally NOT animated — GSAP's from()
-  // can rewrite the inline style attribute, which keeps clobbering
-  // the link colour on browsers that re-evaluate :visited late.
-  // Logo + nav-CTA are fine since they don't have :visited concerns
-  // (logo is an <a> with an image; CTA has explicit own colour rule).
-  tl.from('.hero__logo',      { ...RISE })
-    .from('.hero__nav-cta',   { ...RISE }, '<0.05')
-    .from('.hero__portrait',  { ...RISE, duration: 1.1 }, '0.30')
-    .from('.hero__name',      { ...RISE }, '0.45')
-    .from('.hero__body',      { ...RISE }, '<')
-    .from('.hero__signature', { ...RISE }, '<')
-    .from('.hero__claim',     { ...RISE }, '<')
-    .from('.hero__loc',       { ...RISE }, '<')
-    .from('.hero__ctas',      { ...RISE }, '0.65')
-    .from('.hero__service',   { ...RISE, stagger: 0.07 }, '0.70');
-})();
-
-/* ──────────────────────────────────────────────────────────────
-   2. Service hover — fill the ring with its photo, soft-blur
-      Jakob so the focus shifts to the discovered context.
-   ──────────────────────────────────────────────────────────────*/
-(function () {
-  if (!window.gsap) return;
-  const services = document.querySelectorAll('.hero__service');
-  const portrait = document.querySelector('.hero__portrait img');
-
-  services.forEach(service => {
-    const photo = service.querySelector('.hero__service-photo');
-
-    service.addEventListener('mouseenter', () => {
-      gsap.to(photo,    { opacity: 0.9,  duration: 0.7, ease: 'power2.out' });
-      gsap.to(portrait, { filter: 'blur(2.5px)', duration: 0.7, ease: 'power2.out' });
-    });
-    service.addEventListener('mouseleave', () => {
-      gsap.to(photo,    { opacity: 0,    duration: 0.9, ease: 'power2.inOut' });
-      gsap.to(portrait, { filter: 'blur(0px)', duration: 0.9, ease: 'power2.inOut' });
-    });
+  var services = document.querySelectorAll('.hero__service');
+  var portrait = document.querySelector('.hero__portrait img');
+  if (!services.length || !portrait) return;
+  services.forEach(function (s) {
+    s.addEventListener('mouseenter', function () { portrait.classList.add('hero__portrait-img--blur'); });
+    s.addEventListener('mouseleave', function () { portrait.classList.remove('hero__portrait-img--blur'); });
   });
 })();
 
-/* ──────────────────────────────────────────────────────────────
-   3. Sliding nav indicator under the active link
-   ──────────────────────────────────────────────────────────────*/
+/* ── 2. Sliding nav indicator (vanilla, no GSAP) ────────────────*/
 (function () {
-  if (!window.gsap) return;
-  const nav = document.querySelector('.hero__nav');
+  var nav    = document.querySelector('.hero__nav');
   if (!nav) return;
-  const ind = nav.querySelector('.hero__nav-indicator');
+  var ind    = nav.querySelector('.hero__nav-indicator');
   if (!ind) return;
-  const links  = [...nav.querySelectorAll('a')];
-  const active = nav.querySelector('a[aria-current="page"]');
+  var links  = Array.prototype.slice.call(nav.querySelectorAll('a'));
+  var active = nav.querySelector('a[aria-current="page"]');
 
-  function place(target, animated) {
+  function place(target, animate) {
     if (!target) return;
-    const navRect = nav.getBoundingClientRect();
-    const r       = target.getBoundingClientRect();
-    const x       = r.left - navRect.left;
-    if (animated) gsap.to(ind, { x, duration: 0.4, ease: 'power3.out' });
-    else          gsap.set(ind, { x });
+    var navRect = nav.getBoundingClientRect();
+    var r       = target.getBoundingClientRect();
+    var x       = r.left - navRect.left;
+    if (!animate) {
+      ind.style.transition = 'none';
+      ind.style.transform  = 'translateX(' + x + 'px)';
+      /* force reflow so transition suppression takes effect */
+      ind.getBoundingClientRect();
+      ind.style.transition = '';
+    } else {
+      ind.style.transform = 'translateX(' + x + 'px)';
+    }
   }
-  function init() { place(active, false); }
-  init();
-  window.addEventListener('resize', init);
 
-  links.forEach(a => a.addEventListener('mouseenter', () => place(a, true)));
-  nav.addEventListener('mouseleave', () => place(active, true));
+  /* Wait for fonts so letter-widths are final before measuring */
+  function init() { place(active, false); }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(init);
+  } else {
+    init();
+  }
+  window.addEventListener('resize', function () { place(active, false); });
+
+  links.forEach(function (a) {
+    a.addEventListener('mouseenter', function () { place(a, true); });
+  });
+  nav.addEventListener('mouseleave', function () { place(active, true); });
 })();
 </script>
 
