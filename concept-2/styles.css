@@ -76,9 +76,16 @@ img { display: block; max-width: 100%; }
   z-index: 10;
 }
 
+/* Nav must read white in every link-state. The trick is to set the
+   colour on the PARENT (.hero__nav) and inherit it on every <a>
+   pseudo-state — browsers allow `color: inherit` on :visited where
+   they normally restrict explicit colour values for privacy. */
+.hero__nav { color: #ffffff; }
+
 .hero__nav a,
 .hero__nav a:link,
 .hero__nav a:visited,
+.hero__nav a:hover,
 .hero__nav a:active,
 .hero__nav a:focus {
   position: relative;
@@ -91,10 +98,10 @@ img { display: block; max-width: 100%; }
   font-weight:    400;
   letter-spacing: 0;
   text-transform: uppercase;
-  color: #ffffff !important;     /* defeat browser :visited tint */
+  color: inherit;
   white-space: nowrap;
-  transition: opacity 220ms ease;
   text-decoration: none;
+  transition: opacity 220ms ease;
 }
 .hero__nav a:hover { opacity: 0.65; }
 
@@ -117,7 +124,12 @@ img { display: block; max-width: 100%; }
 
 /* ─── Kontakt button · TOP anchor · x=1258 y=28 w=102 h=40 ─── */
 
-.hero__nav-cta {
+.hero__nav-cta,
+.hero__nav-cta:link,
+.hero__nav-cta:visited,
+.hero__nav-cta:hover,
+.hero__nav-cta:active,
+.hero__nav-cta:focus {
   position: absolute;
   left: calc(var(--gutter) + 1258px);
   top:  28px;
@@ -127,12 +139,13 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   background: var(--blue);
-  color: var(--white) !important;
+  color: #ffffff;
   font-size:      14px;
   line-height:    14px;
   font-weight:    400;
   letter-spacing: 0;
   text-transform: uppercase;
+  text-decoration: none;
   border-radius: 3px;
   z-index: 10;
   transition: background 200ms ease;

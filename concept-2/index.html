@@ -36,14 +36,14 @@
 
   <!-- Nav · Figma Frame 1 · x=546 y=22 w=348 h=46 -->
   <nav class="hero__nav" aria-label="Hauptnavigation">
-    <a href="#" aria-current="page" style="color:#ffffff !important">Startseite</a>
-    <a href="#" style="color:#ffffff !important">Über mich</a>
-    <a href="#" style="color:#ffffff !important">Lesezeichen</a>
+    <a href="#" aria-current="page">Startseite</a>
+    <a href="#">Über mich</a>
+    <a href="#">Lesezeichen</a>
     <span class="hero__nav-indicator" aria-hidden="true"></span>
   </nav>
 
   <!-- Kontakt button · Figma Frame 11 · x=1258 y=28 w=102 h=40 -->
-  <a class="hero__nav-cta" href="#" style="color:#ffffff !important">Kontakt</a>
+  <a class="hero__nav-cta" href="#">Kontakt</a>
 
   <!-- Jakob portrait · Figma 568 / 88 / 537.5 / 713 — anchored bottom -->
   <div class="hero__portrait">
@@ -144,9 +144,13 @@
   const RISE = { opacity: 0, y: 16, duration: 0.9, ease: 'power3.out' };
   const tl   = gsap.timeline({ delay: 0.1 });
 
+  // Nav links are intentionally NOT animated — GSAP's from()
+  // can rewrite the inline style attribute, which keeps clobbering
+  // the link colour on browsers that re-evaluate :visited late.
+  // Logo + nav-CTA are fine since they don't have :visited concerns
+  // (logo is an <a> with an image; CTA has explicit own colour rule).
   tl.from('.hero__logo',      { ...RISE })
-    .from('.hero__nav a',     { ...RISE, stagger: 0.06 }, '<0.05')
-    .from('.hero__nav-cta',   { ...RISE }, '<')
+    .from('.hero__nav-cta',   { ...RISE }, '<0.05')
     .from('.hero__portrait',  { ...RISE, duration: 1.1 }, '0.30')
     .from('.hero__name',      { ...RISE }, '0.45')
     .from('.hero__body',      { ...RISE }, '<')
