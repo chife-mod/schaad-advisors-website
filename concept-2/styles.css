@@ -54,6 +54,16 @@ img { display: block; max-width: 100%; }
   to   { opacity: 1; }
 }
 
+/* Ring continuous slow-spin + counter-spin to keep + upright */
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes plus-stay {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+
 /* Shared shorthand: duration ease delay fill-mode */
 .hero__logo     { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.10s backwards; }
 .hero__nav-cta  { animation: hero-rise 0.9s cubic-bezier(0.23,1,0.32,1) 0.15s backwards; }
@@ -376,7 +386,15 @@ img { display: block; max-width: 100%; }
   cursor: pointer;
 }
 
-/* Ring SVG fills the cell; stroke stays 1px via non-scaling-stroke */
+/* Rotating wrapper — spins ring + plus together; plus counter-spins to stay upright */
+
+.hero__service-ring-wrap {
+  position: absolute;
+  inset: 0;
+  animation: ring-spin 70s linear infinite;
+}
+
+/* Ring SVG fills the wrapper; stroke stays 1px via non-scaling-stroke */
 
 .hero__service-ring {
   position: absolute;
@@ -415,7 +433,9 @@ img { display: block; max-width: 100%; }
   position: absolute;
   left: var(--plus-x-pct, 8%);
   top:  var(--plus-y-pct, 76%);
+  /* base transform is overridden by plus-stay animation which includes both translate + counter-rotate */
   transform: translate(-50%, -50%);
+  animation: plus-stay 70s linear infinite;
   font-size:   13px;
   line-height: 1;
   color: var(--white);

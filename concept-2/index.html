@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Schaad Advisors · Concept 2</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23116490'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='42' fill='white'%3ES%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/service-menu.css">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 
@@ -76,61 +77,72 @@
   <!-- ── Service rings strip · 4 × 25vw responsive cells ── -->
   <ul class="hero__services">
 
-    <!-- + position = gap midpoint on circumference: x=50+49.5·cos(θ), y=50+49.5·sin(θ) -->
+    <!--
+      Each ring is a <path> explicit arc — gap start/end calculated as:
+        gap_start = (rot + 345.6°) % 360  |  gap_end = rot  |  gap_mid = (gap_start + 7.2°) % 360
+        x = 50 + 49.5·cos(θ°)  |  y = 50 + 49.5·sin(θ°)   (θ from 3-o'clock, clockwise)
+      Path draws from gap_end → gap_start (clockwise, large-arc=1, sweep=1).
+      hero__service-ring-wrap rotates the ring + keeps + in the gap;
+      hero__service-plus counter-rotates so the glyph stays upright.
+    -->
 
+    <!-- Advocacy  gap: 141.2° → 155.6°  midpoint 148.4° -->
     <li class="hero__service" data-service="advocacy"
-        style="--plus-x-pct:7.8%;--plus-y-pct:75.9%">
+        style="--plus-x-pct:7.84%;--plus-y-pct:75.94%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/03.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="49.5" fill="none"
-                stroke="#116490" stroke-width="1"
-                vector-effect="non-scaling-stroke"
-                pathLength="1000" stroke-dasharray="960 40"
-                transform="rotate(155.6 50 50)"/>
-      </svg>
-      <span class="hero__service-plus" aria-hidden="true">+</span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 4.921 70.449 A 49.5 49.5 0 1 1 11.423 81.017"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
       <span class="hero__service-label">Advocacy</span>
     </li>
 
+    <!-- Gov. Relations  gap: 272.6° → 287.0°  midpoint 279.8° -->
     <li class="hero__service" data-service="gov"
-        style="--plus-x-pct:58.4%;--plus-y-pct:1.2%">
+        style="--plus-x-pct:58.43%;--plus-y-pct:1.22%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/05.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="49.5" fill="none"
-                stroke="#116490" stroke-width="1"
-                vector-effect="non-scaling-stroke"
-                pathLength="1000" stroke-dasharray="960 40"
-                transform="rotate(-73 50 50)"/>
-      </svg>
-      <span class="hero__service-plus" aria-hidden="true">+</span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 64.472 2.663 A 49.5 49.5 0 1 1 52.245 0.551"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
       <span class="hero__service-label">Gov.&thinsp;Relations</span>
     </li>
 
+    <!-- Regulierung  gap: 141.2° → 155.6°  midpoint 148.4° (same as Advocacy) -->
     <li class="hero__service" data-service="reg"
-        style="--plus-x-pct:7.8%;--plus-y-pct:75.9%">
+        style="--plus-x-pct:7.84%;--plus-y-pct:75.94%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/07.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="49.5" fill="none"
-                stroke="#116490" stroke-width="1"
-                vector-effect="non-scaling-stroke"
-                pathLength="1000" stroke-dasharray="960 40"
-                transform="rotate(155.6 50 50)"/>
-      </svg>
-      <span class="hero__service-plus" aria-hidden="true">+</span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 4.921 70.449 A 49.5 49.5 0 1 1 11.423 81.017"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
       <span class="hero__service-label">Regulierung</span>
     </li>
 
+    <!-- Geopolitik  gap: 196.0° → 210.4°  midpoint 203.2° -->
     <li class="hero__service" data-service="geo"
-        style="--plus-x-pct:4.5%;--plus-y-pct:30.5%">
+        style="--plus-x-pct:4.50%;--plus-y-pct:30.50%">
       <span class="hero__service-photo" style="background-image:url('../assets/images/C1_Hero_Slider/09.jpg')"></span>
-      <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="49.5" fill="none"
-                stroke="#116490" stroke-width="1"
-                vector-effect="non-scaling-stroke"
-                pathLength="1000" stroke-dasharray="960 40"
-                transform="rotate(210.4 50 50)"/>
-      </svg>
-      <span class="hero__service-plus" aria-hidden="true">+</span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 7.306 24.951 A 49.5 49.5 0 1 1 2.418 36.356"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
       <span class="hero__service-label">Geopolitik</span>
     </li>
 
