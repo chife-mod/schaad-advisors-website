@@ -42,10 +42,28 @@ body {
   max-width: 1080px;
   width: 100%;
   margin: 0 auto;
-  padding: 80px 32px 120px;
+  padding: 0 32px 120px;          /* no top padding — logo sticks to viewport top edge */
+}
+
+/* Logo — top-left, h=88px, attached to the very top by its built-in vertical
+   "stick". No extra padding/box around it; left edge aligns with the
+   launcher content column. */
+.launcher__logo {
+  display: block;
+  height: 88px;
+  margin-bottom: 64px;
+}
+.launcher__logo img {
+  display: block;
+  height: 100%;
+  width: auto;
 }
 
 .launcher__header {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 48px;
+  align-items: end;               /* subtitle floats to the title's baseline */
   margin-bottom: 64px;
 }
 
@@ -64,19 +82,21 @@ body {
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.05;
-  margin-bottom: 16px;
-}
-
-.launcher__title em {
-  font-style: normal;
-  color: var(--blue-light);
 }
 
 .launcher__subtitle {
-  font-size: 17px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.65);
-  max-width: 640px;
+  font-size: 14px;                /* was 17px — "помельче" */
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Stack header columns on narrow screens */
+@media (max-width: 760px) {
+  .launcher__header {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-items: start;
+  }
 }
 
 .launcher__grid {
@@ -389,9 +409,15 @@ body {
 </head>
 <body>
 <main class="launcher">
+  <a class="launcher__logo" href="./" aria-label="Schaad Advisors">
+    <img src="assets/LogoBig.svg" alt="Schaad Advisors">
+  </a>
+
   <header class="launcher__header">
-    <span class="launcher__eyebrow">Schaad Advisors · Internal Preview</span>
-    <h1 class="launcher__title">Design <em>Versions</em></h1>
+    <div class="launcher__header-main">
+      <span class="launcher__eyebrow">Schaad Advisors · Internal Preview</span>
+      <h1 class="launcher__title">Website Design Process</h1>
+    </div>
     <p class="launcher__subtitle">
       Preview hub for the Dr. Jakob Schaad website. Each card is a fully isolated HTML page.
       The floating service menu in the bottom-right corner always lets you switch between versions.
