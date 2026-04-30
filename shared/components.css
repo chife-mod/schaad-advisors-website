@@ -1,0 +1,243 @@
+/* ════════════════════════════════════════════════════════════════
+   Schaad Advisors — Component library
+   ──────────────────────────────────────────────────────────────
+   Atomic building blocks shared across the launcher, UIKit page,
+   and concept previews. All values come from shared/tokens.css —
+   never hard-code colours / spacing / type sizes here.
+
+   Classes follow BEM-ish naming: .component, .component--variant.
+   Add new components at the END of the file, document them in
+   uikit/index.html.
+   ──────────────────────────────────────────────────────────── */
+
+/* ════════════════════════════════════════════════════════════
+   BUTTON · .btn + variants + states
+   Mirrors the hero buttons of the website: filled blue (primary),
+   transparent with blue border (ghost). 40px height, 3px radius,
+   uppercase Inter at 14px to feel like the real on-page CTAs.
+   ──────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 22px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background    var(--duration-fast) ease,
+    color         var(--duration-fast) ease,
+    border-color  var(--duration-fast) ease,
+    transform     var(--duration-fast) ease;
+}
+.btn svg { width: 16px; height: 16px; }
+
+/* Primary — filled brand blue, white text */
+.btn--primary {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border: 1px solid transparent;
+}
+.btn--primary:hover  { background: var(--color-accent-deep); }
+.btn--primary:active { transform: translateY(1px); }
+
+/* Ghost — transparent with blue border. On dark surfaces, pass
+   `style="--btn-fg: #fff"` for white text; default ink for light. */
+.btn--ghost {
+  background: transparent;
+  color: var(--btn-fg, var(--color-ink));
+  border: 1px solid var(--color-accent);
+}
+.btn--ghost:hover { background: var(--color-accent-soft); }
+
+/* Text — minimal link button (no border, no fill) */
+.btn--text {
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
+.btn--text:hover { background: rgba(17, 100, 144, 0.06); }
+
+/* Sizes */
+.btn--lg { height: 48px; padding: 0 28px; font-size: 15px; }
+.btn--sm { height: 32px; padding: 0 14px; font-size: 12px; letter-spacing: 0.06em; }
+
+/* States */
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CHIP · .chip + variants
+   Small inline labels: status, tag, mono code-style.
+   ──────────────────────────────────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.chip--solid {
+  background: var(--color-accent);
+  color: var(--color-white);
+}
+
+.chip--ghost {
+  background: transparent;
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.chip--success { background: var(--color-success-bg); color: var(--color-success-fg); }
+.chip--warn    { background: var(--color-warn-bg);    color: var(--color-warn-fg); }
+
+.chip--mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  font-size: 10.5px;
+}
+
+.chip--status {
+  padding: 5px 12px 5px 10px;
+  background: var(--color-glass-dark);
+  color: var(--color-success-accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.chip--status::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 999px;
+  background: var(--color-success-accent);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════════════
+   EYEBROW · uppercase label with leading 32px hairline rule
+   Matches the in-page section eyebrows ("Dienstleistungen").
+   ──────────────────────────────────────────────────────────── */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-uppercase);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  line-height: 1;
+}
+.eyebrow::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.eyebrow--ink   { color: var(--color-ink); }
+.eyebrow--mute  { color: var(--color-mute); }
+.eyebrow--white { color: var(--color-white); }
+
+/* ════════════════════════════════════════════════════════════
+   SERVICE-RING · thin blue circle with center dot · brand mark
+   The signature gesture from concept-2 hero, made into a tile
+   for use in cards / lists as a category marker.
+   ──────────────────────────────────────────────────────────── */
+
+.ring-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  background: transparent;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.ring-mark--lg { width: 72px; height: 72px; font-size: 28px; }
+.ring-mark--sm { width: 40px; height: 40px; font-size: 16px; }
+.ring-mark--filled {
+  background: var(--color-accent);
+  color: var(--color-white);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SECTION INDEX · "S/02 ─────── 06 Bereiche"
+   Editorial chapter mark used at the top of long-form sections.
+   ──────────────────────────────────────────────────────────── */
+
+.section-index {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+  font-variant-numeric: tabular-nums;
+}
+.section-index__tag  { color: var(--color-accent); font-weight: var(--weight-semi); }
+.section-index__rule { flex: 1; height: 1px; background: var(--color-border); }
+
+/* ════════════════════════════════════════════════════════════
+   UTILITIES
+   ──────────────────────────────────────────────────────────── */
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+.hairline { background: var(--color-border); }
+.hairline--h { height: 1px; width: 100%; }
+.hairline--v { width: 1px; height: 100%; }
+
+/* ════════════════════════════════════════════════════════════
+   Reduced motion
+   ──────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition-duration: 0ms; }
+}

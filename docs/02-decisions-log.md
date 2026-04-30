@@ -219,6 +219,143 @@
 
 ---
 
+## ADR-013 — Дизайн-система: tokens.css как Figma-mirror палитра + семантические алиасы
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** на проекте появились параллельные surface'ы (home / sandbox / uikit / concept-1 / concept-2). Каждый имел свои hex'ы — рассинхронизация неминуема. Verena утвердила цветовую палитру с именованными токенами в Figma (node 18:413).
+
+**Решение:**
+- `shared/tokens.css` — единственный источник правды. Содержит **именованную палитру 1:1 с Figma**: `--color-abyss / --color-atlas-dk / --color-atlas / --color-charcoal / --color-pewter / --color-alpine / --color-border / --color-sky-pale / --color-paper / --color-white`.
+- Поверх — **семантические алиасы**: `--color-accent → atlas`, `--color-ink → charcoal`, `--color-mute → pewter`, `--color-divider → border`, `--color-paper`, `--color-bg-deep` (#072634, concept-specific для hero).
+- Components используют **только семантические алиасы**, не именованные токены — это даёт ребрендинг через одну строку: `--color-accent` переключаешь, всё перекрашивается.
+- `shared/components.css` — атомарные компоненты на токенах (.btn, .chip, .eyebrow, .ring-mark, .section-index, .tnum, .hairline). Без хардкода.
+
+---
+
+## ADR-014 — Sandbox + UIKit архитектура для вариантов и design-system
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** в процессе дизайна возникает 2-3 альтернативных варианта одной секции. Раньше они жили на одной странице и мешали выбору. Также нужна visual-reference палитры/компонентов.
+
+**Решение:**
+- `/home/` — **canonical** живая страница, единственная композиция, утверждённая клиентом.
+- `/sandbox/` — **playground** для экспериментальных вариантов. Каждый блок обёрнут в `.sandbox-block` с индексом (B/01, B/02 ...) и dev-only описанием. Стили в `sandbox/styles.css` независимо от home.
+- `/uikit/` — **visual-reference** дизайн-токенов и компонентов. Левый sidebar-фильтр (Colors / Typography / Spacing / Effects / Components / States / Motion). Default filter = «All».
+- **Правило вариантов**: A и B (если живут параллельно) **изолированы**. Комментарий про A не применяется к B и наоборот.
+
+**Связанные файлы:**
+- `shared/preview-config.js` — единый список версий для chip-навигатора (`window.PREVIEW_VERSIONS`).
+- `shared/service-menu.js` + `service-menu.css` — generic chip + 12-col grid-toggle. Project-agnostic. Источник: oz/Project Dashboard template.
+
+---
+
+## ADR-015 — bg-studio: генеративный dark-backdrop вместо растровых фото
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** на hero и CTA одинаковая концепция «тёмный navy с зерном». Раньше использовались разные растры (`06.webp` на hero, `04 copy.webp` на CTA), при `cover`-фитинге каждый файл масштабировался по своим габаритам — **зерно получалось разное**. Это разрушало brand-консистентность.
+
+**Решение:** ввести утилитарный класс **`.bg-studio`** — генеративный dark-backdrop:
+
+1. **Halo** через `radial-gradient(ellipse 70% 60% at 50% 35%, rgba(17,100,144,0.22), transparent 65%)` поверх `var(--color-bg-deep)`.
+2. **Film grain** через `::before` с inline-SVG `<feTurbulence type='fractalNoise' baseFrequency='0.85'>` + `<feComponentTransfer slope=3 intercept=-1>` (контраст pumped к чёрно-белым) + `mix-blend-mode: overlay; opacity: 0.85`.
+
+**Преимущества:**
+- **Идентичное зерно** на любых размерах секции — turbulence генерится pixel-perfect, не растягивается.
+- **~300 байт** inline-SVG вместо 600KB+ webp.
+- Halo на overlay-blend сохраняет среднюю яркость bg.
+- Изменение в `.bg-studio` обновляет ВСЕ surface'ы.
+
+**Где применяется:** `.hero` + `.cta` на home (`class="hero bg-studio"` / `class="cta bg-studio"`).
+
+---
+
+## ADR-016 — Hero service rings: overflow в Leistungen + plus colour-switch
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** ring-strip живёт внизу hero. Обычно секции «упираются друг в друга», hero overflow:hidden обрезает кольца на стыке. Олег предложил пустить кольца **через границу** — наезжать на белый Leistungen ниже, создавая **page-level visual rhyme**.
+
+**Решение:**
+- `.hero { overflow: visible; z-index: 5; }` — кольца спускаются на ~86px ниже низа hero и **перекрывают первую часть Leistungen**.
+- Stroke колец — `var(--color-atlas)` — синий читается и на dark hero, и на белом Leistungen.
+- **Plus-glyph** (`+` в gap кольца) переключается между белым и atlas-blue **по позиции относительно границы** через rAF-цикл: каждый кадр считаем `plus.midY` vs `hero.bottom`, тоггл класса `.on-light`. Cheap (~60fps), синхронно с spin-анимацией.
+- Default plus = white (читается на dark navy), `.on-light` = atlas-blue (читается на белом).
+
+**Альтернативы:**
+- Чисто-CSS через `mix-blend-mode: difference/exclusion` — отвергнуто, не даёт ровно «white-on-dark, blue-on-white».
+- SVG `<mask>` с градиентом по viewport-y — сложно из-за вращения колец.
+
+---
+
+## ADR-017 — Section rhythm: padding 120/120 на всех контентных секциях
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** до унификации секции имели разные top/bottom padding'и (Leistungen 120/160, CTA 160/160, FAQ 160/160). Страница ощущалась как «коллекция блоков», не как ритм-документ.
+
+**Решение:** все три контентные секции (`Leistungen`, `CTA`, `FAQ`) — **`padding: clamp(72px, 10vw, 120px) 0`**. 120/120 на десктопе, плавный спуск к 72/72 на мобильном.
+
+**Эффект:** страница звучит как **единый ритмичный документ**. Müller-Brockmann: повторяемость = инструмент.
+
+**Hero** не имеет padding — фиксированная высота `max(800px, 100vh)`.
+
+---
+
+## ADR-018 — Leistungen: numbered-circle вариант canonical, atlas-blue refresh
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято · клиент утвердил
+
+**Контекст:** прорабатывали 2 варианта секции «6 Leistungsbereiche»:
+- **Variant A** — Swiss editorial с crop-mark уголками на каждой карточке (1px L's в углах, gap 0 → T-junctions на стыках, mono `01-06` в верхнем-левом углу).
+- **Variant B** — numbered circles над заголовком (48px, charcoal disc с белой цифрой).
+
+**Решение:** клиент выбрал **Variant B** для canonical home. Variant A перенесён в `/sandbox/` (block B/01) как reference.
+
+**Refresh:** заливка кружков — `var(--color-atlas)` (вместо изначального charcoal). Прямая рифма с hero ring stroke (тот же brand-blue).
+
+---
+
+## ADR-019 — CTA: Editorial Spread canonical · Ringed Manifesto в sandbox
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** прорабатывали 3 варианта CTA — V1 Editorial Spread (3-col tags-margins вокруг центра), V2 Tonhalle Index (massive headline + numbered editorial index), V3 Ringed Manifesto (8 atlas-rings tile across bottom + asymmetric headline).
+
+**Решение:**
+- **Canonical = V1 Editorial Spread** (на home). Симметричные хайрлайн-pill теги слева/справа, центр с eyebrow + H2 + body + primary button. На bg-studio.
+- **V3 Ringed Manifesto** перенесён в `/sandbox/` (block B/02) — alt-вариант на 1440-frame.
+- **V2 Tonhalle Index** — отвергнут (выглядел SaaS-ы, не швейцарски-тихо).
+
+---
+
+## ADR-020 — FAQ: native `<details>` + sticky title + paper bg + white plate active
+
+**Дата:** 2026-04-30
+**Статус:** ✅ принято
+
+**Контекст:** нужен accordion FAQ. Подходы — JS-managed, native `<details>`, CSS-only через `:checked` + radio-input.
+
+**Решение:** native `<details>/<summary>`:
+- **Accessibility OOTB** — браузер сам управляет ARIA, клавиатура, screen-reader.
+- **Zero JS** — accordion работает без скриптов.
+- **Layout:** 2-col editorial — title слева (`position: sticky; top: 80px`), accordion справа (`5fr / 7fr`).
+- **Bg:** `var(--color-paper)` (#F4F6F8) — break после dark CTA.
+- **Active state:** `.faq__item[open] { background: var(--color-white); }` — открытая карточка поднимается на белую плашку против paper. Question + chevron в `var(--color-atlas)`.
+
+**Контент:** 7 Q/A из вайрфрейма, дословно.
+
+---
+
 ## Открытые вопросы (требуют решения позже)
 
 - [ ] Cursor-reactive Hero-эффект — реализуем после утверждения базового варианта.

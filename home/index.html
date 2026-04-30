@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Schaad Advisors · Home</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23116490'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='42' fill='white'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css?v=2">
+<link rel="stylesheet" href="../shared/service-menu.css?v=3">
+<link rel="stylesheet" href="styles.css?v=59">
+</head>
+<body>
+
+<!--
+  Hero — Concept 2 · "Private banking"
+  Pixel-perfect from Figma node 42:430 · Artboard 1440 × 800.
+
+  Layout strategy:
+    - Header (logo · nav · Kontakt button) anchored to TOP of viewport.
+    - Jakob portrait anchored to BOTTOM of viewport (cut-out fills lower zone).
+    - Left text-block (H1 / body / CTA row) and right text-block (signature
+      / claim / Zürich-Schweiz-2026) both anchored to BOTTOM with offsets
+      matching Figma artboard positions. The bottom of the body paragraph
+      and the bottom of the claim/loc row line up at exactly the same line.
+    - Service ring strip is anchored to bottom: -70px (rings bleed below
+      the visible viewport, matching Figma's frame extending past the artboard).
+-->
+<section class="hero bg-studio">
+
+  <!-- Logo · Figma x=80 y=0 w=328 h=205 -->
+  <a class="hero__logo" href="../" aria-label="Schaad Advisors">
+    <img src="../assets/LogoBig.svg" alt="Schaad Advisors">
+  </a>
+
+  <!-- Nav · Figma Frame 1 · x=546 y=22 w=348 h=46 -->
+  <nav class="hero__nav" aria-label="Hauptnavigation">
+    <a href="#" aria-current="page">Startseite</a>
+    <a href="#">Über mich</a>
+    <a href="#">Lesezeichen</a>
+    <span class="hero__nav-indicator" aria-hidden="true"></span>
+  </nav>
+
+  <!-- Kontakt button · Figma Frame 11 · x=1258 y=28 w=102 h=40 -->
+  <a class="hero__nav-cta" href="#">Kontakt</a>
+
+  <!-- Jakob portrait · Figma 568 / 88 / 537.5 / 713 — anchored bottom -->
+  <div class="hero__portrait">
+    <img src="../assets/images/DrJacob_Color_2x.png" alt="Dr. Jakob Schaad">
+  </div>
+
+  <!-- ── Left text block · anchored bottom ─────────────────── -->
+  <div class="hero__lead">
+    <h1 class="hero__name">Dr. Jakob Schaad</h1>
+    <p class="hero__body">Ich begleite internationale Unternehmen, Verbände und Stiftungen in strategischen politischen Fragen. Ökonomisch fundiert und mit mehr als 30 Jahren Erfahrung.</p>
+    <div class="hero__ctas">
+      <a class="hero__btn hero__btn--primary" href="#">Kontakt aufnehmen</a>
+      <a class="hero__btn hero__btn--ghost"   href="#">Über mich</a>
+    </div>
+  </div>
+
+  <!-- ── Right text block · anchored bottom (same baseline as body) ── -->
+  <div class="hero__right">
+    <img class="hero__signature" src="../assets/images/Signature.png" alt="Dr. Jakob Schaad — signature">
+    <div class="hero__claim-row">
+      <p class="hero__claim">Wissen bündeln.<br>Interessen wahren.<br>Brücken bauen.</p>
+      <div class="hero__loc">
+        <span>Zürich</span>
+        <span>Schweiz</span>
+        <span>2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Service rings strip · 4 × 25vw responsive cells ── -->
+  <ul class="hero__services">
+
+    <!--
+      Each ring is a <path> explicit arc — gap start/end calculated as:
+        gap_start = (rot + 345.6°) % 360  |  gap_end = rot  |  gap_mid = (gap_start + 7.2°) % 360
+        x = 50 + 49.5·cos(θ°)  |  y = 50 + 49.5·sin(θ°)   (θ from 3-o'clock, clockwise)
+      Path draws from gap_end → gap_start (clockwise, large-arc=1, sweep=1).
+      hero__service-ring-wrap rotates the ring + keeps + in the gap;
+      hero__service-plus counter-rotates so the glyph stays upright.
+    -->
+
+    <!-- Advocacy  gap: 141.2° → 155.6°  midpoint 148.4° -->
+    <li class="hero__service" data-service="advocacy"
+        style="--plus-x-pct:7.84%;--plus-y-pct:75.94%">
+      <span class="hero__service-photo" style="background-image:url('../assets/images/Circles/ADVOCACY.webp')"></span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 4.921 70.449 A 49.5 49.5 0 1 1 11.423 81.017"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
+      <span class="hero__service-label">Advocacy</span>
+    </li>
+
+    <!-- Gov. Relations  gap: 272.6° → 287.0°  midpoint 279.8° -->
+    <li class="hero__service" data-service="gov"
+        style="--plus-x-pct:58.43%;--plus-y-pct:1.22%">
+      <span class="hero__service-photo" style="background-image:url('../assets/images/Circles/RELATIONS.webp')"></span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 64.472 2.663 A 49.5 49.5 0 1 1 52.245 0.551"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
+      <span class="hero__service-label">Gov.&thinsp;Relations</span>
+    </li>
+
+    <!-- Regulierung  gap: 141.2° → 155.6°  midpoint 148.4° (same as Advocacy) -->
+    <li class="hero__service" data-service="reg"
+        style="--plus-x-pct:7.84%;--plus-y-pct:75.94%">
+      <span class="hero__service-photo" style="background-image:url('../assets/images/Circles/REGULIERUNG.webp')"></span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 4.921 70.449 A 49.5 49.5 0 1 1 11.423 81.017"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
+      <span class="hero__service-label">Regulierung</span>
+    </li>
+
+    <!-- Geopolitik  gap: 196.0° → 210.4°  midpoint 203.2° -->
+    <li class="hero__service" data-service="geo"
+        style="--plus-x-pct:4.50%;--plus-y-pct:30.50%">
+      <span class="hero__service-photo" style="background-image:url('../assets/images/Circles/GEOPOLITIK.webp')"></span>
+      <div class="hero__service-ring-wrap">
+        <svg class="hero__service-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M 7.306 24.951 A 49.5 49.5 0 1 1 2.418 36.356"
+                fill="none" stroke="#116490" stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <span class="hero__service-plus" aria-hidden="true">+</span>
+      </div>
+      <span class="hero__service-label">Geopolitik</span>
+    </li>
+
+  </ul>
+
+</section>
+
+<!--
+  Section 2 — Leistungen (services)
+  Content sourced verbatim from the client wireframe (DE, final copy).
+  Light counterpart to the dark hero. Layout intent:
+    - Eyebrow + H2 in a two-column header (eyebrow left, title right on desktop).
+    - 6 service cards in a 3 × 2 grid (2-col on tablet, 1-col on small).
+    - Each card has a 48px blue accent stub at top that expands on hover.
+  Markup is ACF-Block-ready: header fields + repeater of 6 service items.
+-->
+<section class="leistungen" id="leistungen" aria-labelledby="leistungen-title">
+  <div class="leistungen__inner">
+
+
+    <header class="leistungen__head">
+      <p class="leistungen__eyebrow">Dienstleistungen</p>
+      <h2 class="leistungen__title" id="leistungen-title">Sechs Leistungsbereiche –<br>eine strategische Perspektive</h2>
+    </header>
+
+    <ol class="leistungen__grid" role="list">
+
+      <li class="leistung">
+        <span class="leistung__num" aria-hidden="true">01</span>
+        <h3 class="leistung__title">Advocacy &amp; Government Relations</h3>
+        <p class="leistung__desc">Wirkungsvolle Interessenvertretung an den Schnittstellen von Politik und Verwaltung. Ich begleite Ihre Anliegen strategisch und diskret, um einen konstruktiven Dialog mit Entscheidungsträgern in der Schweiz und international sicherzustellen.</p>
+      </li>
+
+      <li class="leistung">
+        <span class="leistung__num" aria-hidden="true">02</span>
+        <h3 class="leistung__title">Regulatorische Strategieentwicklung</h3>
+        <p class="leistung__desc">Die Auswirkungen kommender Regulierungen auf Ihr Geschäftsmodell frühzeitig antizipieren und unternehmerische Handlungsspielräume sichern – mit Fokus in den Sektoren Energie, Finanzen und Rohstoffhandel.</p>
+      </li>
+
+      <li class="leistung">
+        <span class="leistung__num" aria-hidden="true">03</span>
+        <h3 class="leistung__title">Geopolitische Risikoanalysen</h3>
+        <p class="leistung__desc">Präzise Lagebeurteilung politischer Risiken für Ihr internationales Geschäft. Ich biete faktenbasierte Analysen und Strategieworkshops als Basis für Ihre Entscheidungen.</p>
+      </li>
+
+      <li class="leistung">
+        <span class="leistung__num" aria-hidden="true">04</span>
+        <h3 class="leistung__title">VR-Mandate</h3>
+        <p class="leistung__desc">Strategische Aufsicht mit ökonomischem Weitblick. Ich verstärke Verwaltungsräte durch langjährige regulatorische Erfahrung und ein tiefes Verständnis für komplexe Marktstrukturen.</p>
+      </li>
+
+      <li class="leistung">
+        <span class="leistung__num" aria-hidden="true">05</span>
+        <h3 class="leistung__title">Ausbildner in Finanzfragen</h3>
+        <p class="leistung__desc">Ausbildner in der Vermögensverwaltung in Kooperation mit Safe Hands. Als SAQ-Prüfungsexperte begleite ich die Zertifizierung von Wealth Management Advisors (CWMA).</p>
+      </li>
+
+      <li class="leistung">
+        <span class="leistung__num" aria-hidden="true">06</span>
+        <h3 class="leistung__title">Vorträge</h3>
+        <p class="leistung__desc">Keynotes, Fachvorträge und Moderationen zu Wirtschafts- und Finanzpolitik sowie Rohstoffmärkten. Souveräne Vermittlung komplexer Zusammenhänge auf Deutsch, Englisch und Französisch.</p>
+      </li>
+
+    </ol>
+
+  </div>
+</section>
+
+<!--
+  Section 3 — CTA · Editorial Spread (client-approved canonical)
+  Symmetric 3-col grid on dark navy with photo overlay:
+    - 4 tags-left | centre copy + button | 4 tags-right
+    - Same photo bg + gradient overlay as the rings variant
+-->
+<section class="cta bg-studio" id="cta" aria-labelledby="cta-title">
+  <div class="cta__inner">
+
+    <ul class="cta__tags cta__tags--left" aria-label="Themenfelder">
+      <li>Advocacy</li>
+      <li>Public Affairs</li>
+      <li>Strategieentwicklung</li>
+      <li>Polit. Risikomanagement</li>
+    </ul>
+
+    <div class="cta__center">
+      <p class="cta__eyebrow">Kontakt aufnehmen</p>
+      <h2 class="cta__title" id="cta-title">Ihre Strategie an der Schnittstelle von Politik und Wirtschaft.</h2>
+      <p class="cta__body">Haben Sie eine konkrete Frage oder ein regulatorisches Projekt, das Sie beschäftigt? Schildern Sie mir kurz Ihre Situation – ich melde mich innerhalb von 48 Stunden.</p>
+      <a class="cta__btn" href="#kontakt">
+        <span class="cta__btn-arrow" aria-hidden="true">→</span>
+        Nachricht senden
+      </a>
+    </div>
+
+    <ul class="cta__tags cta__tags--right" aria-label="Themenfelder · Sektoren">
+      <li>Energiepolitik</li>
+      <li>Finanzregulierung</li>
+      <li>Rohstoffhandel</li>
+      <li>Geopolitische Risiken</li>
+    </ul>
+
+  </div>
+</section>
+
+<!--
+  Section 4 — FAQ
+  Content sourced verbatim from the client wireframe (DE, final copy).
+  Layout: editorial 2-col on paper bg.
+    - Left col: eyebrow + display H2 (matches Leistungen header style).
+    - Right col: stacked native <details> items; active item highlights
+      to a clean white plate against the paper section bg.
+  Markup ACF-Block-ready: header fields + repeater of 7 Q/A items.
+-->
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <div class="faq__inner">
+
+    <header class="faq__head">
+      <p class="faq__eyebrow">Häufige Fragen</p>
+      <h2 class="faq__title" id="faq-title">Was Klienten<br>wissen möchten</h2>
+    </header>
+
+    <div class="faq__list">
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">Was bedeutet strategisches Lobbying?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Lobbying ist das professionelle Einbringen von Fakten in den politischen Prozess. Meine Arbeit basiert auf Transparenz und Sachpolitik, um den Dialog zwischen Wirtschaft und Politik in der Schweiz legitim und wirksam zu gestalten.</div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">Für wen sind Sie tätig?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Ich berate internationale Unternehmen, Verbände und Stiftungen in komplexen Märkten – insbesondere in den Sektoren Energie, Finanzen und Rohstoffhandel. Meine Klienten schätzen meine Erfahrung und den direkten Zugang zu Entscheidungsträgern.</div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">Was unterscheidet Sie von einer Agentur?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Sie arbeiten direkt mit mir zusammen. Mein Vorteil ist die doppelte Perspektive: Ich kenne das politische System als ehemaliger Regierungsberater von innen und als Interessenvertreter von aussen.</div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">In welchen Feldern liegt Ihre Expertise?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Meine Schwerpunkte sind die Energiepolitik, Finanzmarktregulierung, der Rohstoffhandel sowie die Analyse geopolitischer Risiken. Ich agiere dabei auf kantonaler, nationaler und internationaler Ebene.</div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">Arbeiten Sie allein oder im Team?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Ich berate persönlich und exklusiv. Für spezifische rechtliche oder kommunikative Fachfragen greife ich auf ein eingespieltes Experten-Netzwerk zurück, behalte aber stets die strategische Federführung.</div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">Was kostet eine Zusammenarbeit?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Das hängt vom Umfang und der Dauer des Mandats ab. Ich arbeite sowohl auf Stundenbasis als auch mit Retainer-Modellen. Für eine erste Einschätzung: Kontaktieren Sie mich für ein unverbindliches Gespräch.</div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          <span class="faq__q-text">In welchen Sprachen und Regionen beraten Sie?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </summary>
+        <div class="faq__a">Ich berate auf Deutsch, Englisch und Französisch. Mein Netzwerk umfasst die Schweiz sowie internationale Gremien (EU, IWF). Ich begleite Kunden sowohl beim Markteintritt in die Schweiz als auch bei der globalen Positionierung.</div>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+/* ── Plus colour switch — white on dark hero, atlas-blue on white Leistungen.
+   Each plus rotates with its ring, so its midpoint vs hero.bottom changes
+   continuously. rAF loop is cheap and stays in sync with the spin animation. */
+(function () {
+  var hero = document.querySelector('.hero');
+  var pluses = document.querySelectorAll('.hero__service-plus');
+  if (!hero || !pluses.length) return;
+  function update() {
+    var heroBottom = hero.getBoundingClientRect().bottom;
+    for (var i = 0; i < pluses.length; i++) {
+      var r = pluses[i].getBoundingClientRect();
+      var mid = r.top + r.height / 2;
+      pluses[i].classList.toggle('on-light', mid > heroBottom);
+    }
+    requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+})();
+
+/* ── Sliding nav indicator (vanilla, no GSAP) ────────────────*/
+(function () {
+  var nav    = document.querySelector('.hero__nav');
+  if (!nav) return;
+  var ind    = nav.querySelector('.hero__nav-indicator');
+  if (!ind) return;
+  var links  = Array.prototype.slice.call(nav.querySelectorAll('a'));
+  var active = nav.querySelector('a[aria-current="page"]');
+
+  function place(target, animate) {
+    if (!target) return;
+    var navRect = nav.getBoundingClientRect();
+    var r       = target.getBoundingClientRect();
+    var x       = r.left - navRect.left;
+    if (!animate) {
+      ind.style.transition = 'none';
+      ind.style.transform  = 'translateX(' + x + 'px)';
+      /* force reflow so transition suppression takes effect */
+      ind.getBoundingClientRect();
+      ind.style.transition = '';
+    } else {
+      ind.style.transform = 'translateX(' + x + 'px)';
+    }
+  }
+
+  /* Wait for fonts so letter-widths are final before measuring */
+  function init() { place(active, false); }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(init);
+  } else {
+    init();
+  }
+  window.addEventListener('resize', function () { place(active, false); });
+
+  links.forEach(function (a) {
+    a.addEventListener('mouseenter', function () { place(a, true); });
+  });
+  nav.addEventListener('mouseleave', function () { place(active, true); });
+})();
+</script>
+
+<script src="../shared/preview-config.js"></script>
+<script defer src="../shared/service-menu.js"></script>
+</body>
+</html>

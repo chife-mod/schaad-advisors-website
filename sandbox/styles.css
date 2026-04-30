@@ -1,0 +1,406 @@
+/* ════════════════════════════════════════════════════════════════
+   Sandbox — experimental ground.
+   Lightweight page chrome (logo + caption mast at top), then a stack
+   of self-contained blocks. Each block has a small dev-only header
+   with an index (B/NN) so we can reference fragments in chat.
+   ──────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; }
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background: var(--color-paper);
+  color: var(--color-charcoal);
+  min-height: 100vh;
+}
+a   { text-decoration: none; color: inherit; }
+ul, ol { list-style: none; }
+img { display: block; max-width: 100%; }
+
+/* ─── Sandbox mast (logo + caption) ────────────────────────── */
+
+.sandbox-mast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px clamp(24px, 5vw, 80px);
+  border-bottom: 1px solid var(--color-border);
+  background: #ffffff;
+}
+.sandbox-mast__logo img {
+  display: block;
+  height: 56px;
+  width: auto;
+}
+.sandbox-mast__caption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-pewter);
+}
+
+/* ─── Sandbox block (wraps each fragment) ──────────────────── */
+
+.sandbox-block + .sandbox-block { border-top: 1px dashed var(--color-border); }
+
+.sandbox-block__head {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(48px, 6vw, 80px) clamp(24px, 5vw, 80px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sandbox-block__index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-atlas);
+}
+.sandbox-block__title {
+  font-size: clamp(22px, 2.4vw, 32px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-charcoal);
+}
+.sandbox-block__note {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-pewter);
+  max-width: 720px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Block 01 · Leistungen — Variante A · Crop-mark cells
+   Moved here from home/ — the client picked the numbered-circle
+   variant for the canonical Leistungen, this one stays as reference.
+   ──────────────────────────────────────────────────────────── */
+
+.leistungen {
+  background: #ffffff;
+  color: var(--color-charcoal);
+  padding: 0 0 clamp(96px, 12vw, 160px);
+}
+
+.leistungen__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 80px);
+}
+
+.leistungen__head {
+  max-width: 880px;
+  margin-bottom: 80px;
+  padding-top: clamp(48px, 6vw, 80px);
+}
+
+.leistungen__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-atlas);
+  margin-bottom: 28px;
+}
+.leistungen__eyebrow::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: var(--color-atlas);
+  flex-shrink: 0;
+}
+
+.leistungen__title {
+  font-size: clamp(30px, 4.2vw, 52px);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.06;
+  color: var(--color-charcoal);
+}
+.leistungen__title br { display: none; }
+@media (min-width: 1024px) { .leistungen__title br { display: inline; } }
+
+/* 3 × 2 grid, gap collapsed → adjacent corner marks join into clean
+   1px T-junctions; outer corners stay full L's. */
+
+.leistungen-v2__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+@media (max-width: 980px) {
+  .leistungen-v2__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .leistungen-v2__grid { grid-template-columns: 1fr; }
+}
+
+.leistung-v2 {
+  position: relative;
+  background-color: transparent;
+  padding: clamp(40px, 4vw, 56px) clamp(28px, 2.6vw, 40px);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 280ms ease;
+}
+
+/* Crop marks: real CSS border + 4-corner mask. ::before extends 1px
+   past the cell on right + bottom so adjacent cells' borders overlap
+   on the shared boundary line — clean 1px crossings, not 2px doubles. */
+
+.leistung-v2::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right:  -1px;
+  bottom: -1px;
+  border: 1px solid var(--color-alpine);
+  pointer-events: none;
+
+  --c: 8px;
+  -webkit-mask:
+    linear-gradient(#000, #000) top    left  / var(--c) var(--c) no-repeat,
+    linear-gradient(#000, #000) top    right / var(--c) var(--c) no-repeat,
+    linear-gradient(#000, #000) bottom left  / var(--c) var(--c) no-repeat,
+    linear-gradient(#000, #000) bottom right / var(--c) var(--c) no-repeat;
+          mask:
+    linear-gradient(#000, #000) top    left  / var(--c) var(--c) no-repeat,
+    linear-gradient(#000, #000) top    right / var(--c) var(--c) no-repeat,
+    linear-gradient(#000, #000) bottom left  / var(--c) var(--c) no-repeat,
+    linear-gradient(#000, #000) bottom right / var(--c) var(--c) no-repeat;
+}
+
+.leistung-v2:hover,
+.leistung-v2:focus-within {
+  background-color: var(--color-paper);
+}
+
+/* "01"–"06" pinned to the top-LEFT corner of the cell — mono, alpine. */
+
+.leistung-v2__num {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-alpine);
+  z-index: 1;
+}
+
+.leistung-v2__title {
+  font-size: clamp(20px, 1.8vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  color: var(--color-charcoal);
+  margin-bottom: 18px;
+}
+
+.leistung-v2__desc {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--color-mute);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Block 02 · CTA — Ringed Manifesto (moved from home)
+   Asymmetric headline + 8 atlas-blue rings tiling the bottom edge.
+   Photo bg + dark gradient overlay, section capped to 1440.
+   ──────────────────────────────────────────────────────────── */
+
+.cta--v3 {
+  position: relative;
+  background: var(--color-bg-deep);          /* base; .bg-studio adds halo + grain */
+  color: var(--color-white);
+  padding: 0;
+  height: 650px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/* Studio backdrop — same generative grain as on home (radial halo +
+   SVG turbulence noise). Identical pattern across every dark section. */
+
+.bg-studio {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 35%,
+      rgba(17, 100, 144, 0.22) 0%,
+      transparent 65%),
+    var(--color-bg-deep);
+}
+
+.bg-studio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1   0 0 0 0 1   0 0 0 0 1   0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  background-repeat: repeat;
+  opacity: 0.22;
+}
+
+.cta-v3__top {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 80px clamp(24px, 5vw, 80px) 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: clamp(40px, 6vw, 96px);
+  align-items: end;
+}
+@media (max-width: 980px) {
+  .cta-v3__top {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+}
+
+.cta-v3__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-alpine);
+  margin-bottom: 28px;
+}
+.cta-v3__eyebrow::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: var(--color-alpine);
+  flex-shrink: 0;
+}
+
+.cta-v3__title {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+  color: var(--color-white);
+  text-wrap: balance;
+}
+
+.cta-v3__support {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.cta-v3__body {
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 460px;
+  margin: 0;
+}
+
+.cta-v3__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 26px;
+  background: var(--color-atlas);
+  color: var(--color-white);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 3px;
+  transition: background 200ms ease;
+}
+.cta-v3__btn-arrow { display: inline-block; transition: transform 200ms ease; }
+.cta-v3__btn:hover { background: var(--color-atlas-dk); }
+.cta-v3__btn:hover .cta-v3__btn-arrow { transform: translateX(4px); }
+
+/* Rings strip — full row width (capped at 1440 by section), atlas blue */
+
+.cta-v3__rings {
+  --ring-overlap: 22px;
+  --ring-min: 110px;
+  --ring-max: 220px;
+  --rings-frame: min(100vw, 1440px);
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  width: var(--rings-frame);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0;
+  row-gap: 0;
+}
+
+.cta-v3__rings li {
+  width: clamp(
+    var(--ring-min),
+    calc((var(--rings-frame) + 7 * var(--ring-overlap)) / 8),
+    var(--ring-max)
+  );
+  aspect-ratio: 1;
+  margin: 0 calc(var(--ring-overlap) / -2);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--color-atlas);
+  border-radius: 50%;
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.25;
+  padding: 0 22px;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+  .cta-v3__rings { --ring-overlap: 16px; --ring-min: 100px; }
+  .cta-v3__rings li { font-size: 13px; padding: 0 14px; }
+}
+
+@media (max-height: 720px) and (max-width: 980px) {
+  .cta--v3 { height: auto; min-height: 540px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

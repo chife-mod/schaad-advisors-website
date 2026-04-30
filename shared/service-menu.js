@@ -1,70 +1,69 @@
 /**
- * Service Menu — preview-only floating navigator.
- * Inject into any preview version with:
- *   <link rel="stylesheet" href="../shared/service-menu.css">
+ * Service Menu — preview-only floating navigator + 12-column grid toggle.
+ *
+ * Generic across projects. Configure per-project by setting either of these
+ * BEFORE this script loads (or via a small inline <script> on each page):
+ *
+ *   <script>
+ *     window.PREVIEW_PROJECT_NAME = "My Project";    // shown in panel header
+ *     window.PREVIEW_VERSIONS = [
+ *       { id: "launcher",  label: "Launcher",  desc: "Index of all versions",         path: "" },
+ *       { id: "concept-1", label: "Concept 1", desc: "Short description for the pill", path: "concept-1/" },
+ *       // ...
+ *     ];
+ *     window.PREVIEW_DEFAULT_VERSION = "concept-1";  // surfaced on launcher page
+ *   </script>
+ *   <link  rel="stylesheet" href="../shared/service-menu.css">
  *   <script defer src="../shared/service-menu.js"></script>
  *
- * Build-time strip: when WP-final build is produced, this file is not included.
+ * Falls back to a single "Launcher" version if nothing is configured.
+ * Grid-overlay state persisted in localStorage as "preview-grid".
  */
 
 (function () {
   "use strict";
 
-  if (window.__schaadServiceMenuInited) return;
-  window.__schaadServiceMenuInited = true;
+  if (window.__previewServiceMenuInited) return;
+  window.__previewServiceMenuInited = true;
 
-  const VERSIONS = [
-    {
-      id: "launcher",
-      label: "Launcher",
-      desc: "Index of all preview versions",
-      path: "",
-    },
-    {
-      id: "concept-2",
-      label: "Concept 2",
-      desc: "Private banking · centred portrait + service rings",
-      path: "concept-2/",
-    },
-    {
-      id: "concept-1",
-      label: "Concept 1",
-      desc: "Hybrid hero · random photo-strip + mouse priority",
-      path: "concept-1/",
-    },
-    {
-      id: "wireframe",
-      label: "Wireframe",
-      desc: "Original mockup from client (2026-04-15)",
-      path: "wireframe/",
-    },
-  ];
+  /* ── Config (read from window globals, with sensible defaults) ── */
 
-  const DEFAULT_VERSION_ID = "concept-2";
+  var PROJECT_NAME = window.PREVIEW_PROJECT_NAME || "Project Preview";
 
-  // Detect base URL by locating this script's <script> tag.
+  var VERSIONS = (Array.isArray(window.PREVIEW_VERSIONS) && window.PREVIEW_VERSIONS.length)
+    ? window.PREVIEW_VERSIONS
+    : [{ id: "launcher", label: "Launcher", desc: "Index of all preview versions", path: "" }];
+
+  var DEFAULT_VERSION_ID = window.PREVIEW_DEFAULT_VERSION || VERSIONS[0].id;
+
+  /* ── Base-URL detection (project root, relative to this script) ── */
+
   function detectBase() {
-    const scripts = document.querySelectorAll('script[src*="service-menu"]');
+    var scripts = document.querySelectorAll('script[src*="service-menu"]');
     if (!scripts.length) return "/";
-    const src = scripts[scripts.length - 1].getAttribute("src");
-    const url = new URL(src, window.location.href);
-    const idx = url.pathname.lastIndexOf("/shared/");
+    var src = scripts[scripts.length - 1].getAttribute("src");
+    var url = new URL(src, window.location.href);
+    var idx = url.pathname.lastIndexOf("/shared/");
     return idx >= 0 ? url.pathname.substring(0, idx + 1) : "/";
   }
 
   function detectActive(base) {
-    const path = window.location.pathname;
-    // Match longest suffix first (concept-1 before launcher).
-    for (const v of VERSIONS) {
+    var path = window.location.pathname;
+    for (var i = 0; i < VERSIONS.length; i++) {
+      var v = VERSIONS[i];
       if (!v.path) continue;
-      if (path.indexOf(base + v.path) === 0 || path.endsWith("/" + v.path) || path.endsWith("/" + v.path + "index.html")) {
+      if (
+        path.indexOf(base + v.path) === 0 ||
+        path.endsWith("/" + v.path) ||
+        path.endsWith("/" + v.path + "index.html")
+      ) {
         return v.id;
       }
     }
-    // Default: when on the launcher page, surface the latest concept in
-    // the pill so the user can jump to it in one click.
     return DEFAULT_VERSION_ID;
   }
+
+  /* ── Inline SVGs ── */
 
   function svgLayers() {
     return (
@@ -83,17 +82,29 @@
     );
   }
 
-  function build() {
-    const base = detectBase();
-    const activeId = detectActive(base);
-    const activeVersion = VERSIONS.find((v) => v.id === activeId) || VERSIONS[0];
+  function svgGrid() {
+    return (
+      '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<rect x="3.5" y="3.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
+      '<rect x="13.5" y="3.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
+      '<rect x="3.5" y="13.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
+      '<rect x="13.5" y="13.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
+      "</svg>"
+    );
+  }
 
-    const root = document.createElement("div");
+  /* ── Build & mount: version chip ── */
+
+  function build() {
+    var base = detectBase();
+    var activeId = detectActive(base);
+    var activeVersion = VERSIONS.find(function (v) { return v.id === activeId; }) || VERSIONS[0];
+
+    var root = document.createElement("div");
     root.className = "service-menu";
     root.setAttribute("data-open", "false");
 
-    // Capsule (always visible).
-    const capsule = document.createElement("button");
+    var capsule = document.createElement("button");
     capsule.type = "button";
     capsule.className = "service-menu__capsule";
     capsule.setAttribute("aria-expanded", "false");
@@ -101,26 +112,25 @@
     capsule.setAttribute("aria-label", "Switch preview version");
     capsule.innerHTML =
       svgLayers() +
-      '<span class="service-menu__label"><span class="service-menu__label-prefix">Version:</span>' +
+      '<span class="service-menu__label">' +
       escapeHtml(activeVersion.label) +
       "</span>" +
       svgCaret();
 
-    // Panel.
-    const panel = document.createElement("div");
+    var panel = document.createElement("div");
     panel.className = "service-menu__panel";
     panel.setAttribute("role", "menu");
 
-    const header = document.createElement("div");
+    var header = document.createElement("div");
     header.className = "service-menu__panel-header";
-    header.textContent = "Schaad Advisors — Preview";
+    header.textContent = PROJECT_NAME + " — Preview";
     panel.appendChild(header);
 
-    const list = document.createElement("ul");
+    var list = document.createElement("ul");
     list.className = "service-menu__list";
-    VERSIONS.forEach((v) => {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
+    VERSIONS.forEach(function (v) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
       a.className = "service-menu__item";
       a.href = base + v.path;
       a.setAttribute("role", "menuitem");
@@ -133,7 +143,7 @@
     });
     panel.appendChild(list);
 
-    const footer = document.createElement("div");
+    var footer = document.createElement("div");
     footer.className = "service-menu__footer";
     footer.textContent = "Internal preview · not for distribution";
     panel.appendChild(footer);
@@ -142,7 +152,6 @@
     root.appendChild(panel);
     document.body.appendChild(root);
 
-    // Toggle.
     function setOpen(open) {
       root.setAttribute("data-open", open ? "true" : "false");
       capsule.setAttribute("aria-expanded", open ? "true" : "false");
@@ -165,9 +174,63 @@
     });
   }
 
+  /* ── Grid overlay (12-column system reference) ──────────────
+     Independent of the version chip. Toggle button (circle) sits
+     to the LEFT of the chip; click flips the .grid-overlay
+     visibility. State persisted in localStorage so it stays on
+     across page navigation. */
+
+  function buildGrid() {
+    var overlay = document.createElement("div");
+    overlay.className = "grid-overlay";
+
+    var frame = document.createElement("div");
+    frame.className = "grid-overlay__frame";
+
+    var cols = document.createElement("div");
+    cols.className = "grid-overlay__cols";
+    for (var i = 0; i < 12; i++) {
+      var col = document.createElement("div");
+      col.className = "grid-overlay__col";
+      cols.appendChild(col);
+    }
+    frame.appendChild(cols);
+    overlay.appendChild(frame);
+    document.body.appendChild(overlay);
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "grid-toggle";
+    btn.setAttribute("aria-label", "Toggle 12-column grid overlay");
+    btn.innerHTML = svgGrid();
+
+    /* Attach inside .service-menu (created by build() above) so the toggle
+       sits as a flex sibling LEFT of the version capsule. */
+    var menu = document.querySelector(".service-menu");
+    if (menu) menu.insertBefore(btn, menu.firstChild);
+    else document.body.appendChild(btn);
+
+    var stored = false;
+    try { stored = localStorage.getItem("preview-grid") === "on"; } catch (_) {}
+    if (stored) {
+      overlay.classList.add("is-on");
+      btn.classList.add("is-on");
+    }
+
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var on = !overlay.classList.contains("is-on");
+      overlay.classList.toggle("is-on", on);
+      btn.classList.toggle("is-on", on);
+      try { localStorage.setItem("preview-grid", on ? "on" : "off"); } catch (_) {}
+    });
+  }
+
+  function init() { build(); buildGrid(); }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", build);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
-    build();
+    init();
   }
 })();

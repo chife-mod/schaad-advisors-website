@@ -1,0 +1,144 @@
+/* ════════════════════════════════════════════════════════════════
+   Schaad Advisors — Design tokens (single source of truth)
+   ──────────────────────────────────────────────────────────────
+   Project palette + Inter typography from the brief (CLAUDE.md).
+   Edit a value here → everything that uses the token updates:
+   buttons, chips, eyebrows, the UIKit reference page.
+
+   Loaded by:
+     - shared/components.css        — atomic class library
+     - uikit/index.html             — visual reference
+     - any concept page that wants to share these tokens
+   ──────────────────────────────────────────────────────────── */
+
+:root {
+  /* ─── NAMED BRAND PALETTE  (Figma node 18:413, dark → light)
+     V1 token palette — these are the source of truth. Semantic
+     names below are aliases mapped onto these. If a hex changes
+     in Figma, update it here and every alias propagates. */
+
+  --color-abyss:    #0D3F5C;               /* darkest blue       */
+  --color-atlas-dk: #0D4F72;               /* dark brand blue    */
+  --color-atlas:    #116490;               /* primary brand blue */
+  --color-charcoal: #1E2A35;               /* ink                */
+  --color-pewter:   #6B7C8D;               /* secondary ink      */
+  --color-alpine:   #9FBACD;               /* light blue accent  */
+  --color-border:   #D8E5ED;               /* divider            */
+  --color-sky-pale: #E8F2F7;               /* pale blue tint     */
+  --color-paper:    #F4F6F8;               /* paper background   */
+  --color-white:    #FFFFFF;
+
+  /* ─── SEMANTIC ALIASES  (use these in components) ──────────
+     Components.css and concept pages should reach for the
+     semantic names — that way swapping a token rebrands the
+     whole library without touching component code. */
+
+  --color-accent:      var(--color-atlas);       /* primary brand */
+  --color-accent-deep: var(--color-atlas-dk);    /* hover / pressed */
+  --color-accent-soft: var(--color-sky-pale);    /* tinted bg */
+  --color-accent-mute: var(--color-alpine);      /* light accent */
+
+  --color-ink:          var(--color-charcoal);   /* body text */
+  --color-mute:         var(--color-pewter);     /* secondary text */
+
+  /* ─── CONCEPT-SPECIFIC (not in the Figma palette, kept literal)
+     Used by concept-2 hero only — the photographic backdrop is a
+     darker navy than Figma's `abyss`. Don't reach for this elsewhere. */
+
+  --color-bg-deep:      #072634;
+
+  /* ─── BORDER ALIAS ─────────────────────────────────────────── */
+  --color-divider:      var(--color-border);
+
+  /* ─── STATUS · semantic, project-agnostic ─────────────────── */
+  --color-success-bg:     #DCFCE7;
+  --color-success-fg:     #15803D;
+  --color-success-accent: #4ADE80;
+  --color-warn-bg:        #FFEDD5;
+  --color-warn-fg:        #C2410C;
+  --color-pin:            #EF4444;
+
+  /* ─── GLASS surfaces (used by floating chip, dialogs) ───── */
+  --color-glass-bg:    rgba(255, 255, 255, 0.80);
+  --color-glass-dark:  rgba(7, 38, 52, 0.94);
+  --color-glass-blur:  10px;
+
+  /* ─── TYPE families · single-family Inter (CLAUDE.md) ────── */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ─── TYPE scale ─────────────────────────────────────────── */
+  --text-display:        clamp(64px, 9vw, 112px);   /* hero H1 */
+  --text-display-static: 96px;                       /* fallback */
+  --text-h2:             clamp(30px, 4.2vw, 52px);
+  --text-h3:             23px;                       /* leistung title */
+  --text-body:           16px;
+  --text-small:          14px;
+  --text-caption:        12px;
+  --text-eyebrow:        12px;
+
+  /* ─── TYPE weights · per CLAUDE.md ─────────────────────── */
+  --weight-body:    400;
+  --weight-medium:  500;                             /* eyebrow, nav */
+  --weight-semi:    600;                             /* H2 / H3 */
+  --weight-bold:    700;                             /* hero H1 */
+  --weight-heavy:   800;
+
+  /* ─── TYPE letter-spacing ────────────────────────────────── */
+  --track-display: -0.022em;                         /* tight display */
+  --track-tight:   -0.01em;
+  --track-normal:  0;
+  --track-wide:    0.12em;                           /* eyebrow / nav */
+  --track-uppercase: 0.18em;                         /* small caps eyebrow */
+
+  /* ─── TYPE leading ───────────────────────────────────────── */
+  --leading-display: 1.05;
+  --leading-tight:   1.25;
+  --leading-body:    1.65;
+  --leading-loose:   1.75;
+
+  /* ─── SPACING · 4px grid ──────────────────────────────────── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ─── RADIUS ─────────────────────────────────────────────── */
+  --radius-sm:    3px;                               /* button (matches hero) */
+  --radius-md:    6px;
+  --radius-lg:   10px;
+  --radius-xl:   14px;
+  --radius-2xl:  18px;
+  --radius-pill: 999px;
+
+  /* ─── SHADOW · subtle, premium-restraint ───────────────── */
+  --shadow-island: 0 4px 14px -2px rgba(7, 38, 52, 0.08), 0 1px 3px rgba(7, 38, 52, 0.04);
+  --shadow-card:   0 18px 48px -12px rgba(7, 38, 52, 0.18);
+  --shadow-accent: 0 8px 24px -8px rgba(17, 100, 144, 0.45);
+  --shadow-chip:   0 12px 40px rgba(0, 0, 0, 0.5);
+
+  /* ─── MOTION ─────────────────────────────────────────────── */
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-back:       cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-swiss:      cubic-bezier(0.2, 0.8, 0.2, 1);   /* Swiss precision */
+  --duration-fast:   180ms;
+  --duration-normal: 280ms;
+  --duration-slow:   600ms;
+
+  /* ─── LAYOUT ──────────────────────────────────────────────── */
+  --layout-max:    1280px;                           /* page max-width */
+  --layout-frame:  1440px;                           /* hero artboard  */
+  --layout-gutter: clamp(24px, 5vw, 80px);           /* side padding   */
+}
+
+/* ─── Number tabular numerals helper ─────────────────────────
+   Apply via `font-variant-numeric: tabular-nums` or use the
+   `.tnum` utility from components.css. */

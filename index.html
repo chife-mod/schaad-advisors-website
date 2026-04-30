@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Schaad Advisors — Preview Launcher</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23116490'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='42' fill='white'%3ES%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="shared/service-menu.css">
+<link rel="stylesheet" href="shared/service-menu.css?v=3">
 <style>
 :root {
   --blue: #116490;
@@ -425,11 +425,20 @@ body {
   </header>
 
   <div class="launcher__grid">
+    <a class="version-card" href="home/">
+      <span class="version-card__tag">Active</span>
+      <h2 class="version-card__title">Home page</h2>
+      <p class="version-card__desc">
+        Live development branch — evolving from the approved Concept 2. All ongoing work on the Startseite happens here.
+      </p>
+      <span class="version-card__cta">Open</span>
+    </a>
+
     <a class="version-card" href="concept-2/">
-      <span class="version-card__tag">Latest</span>
+      <span class="version-card__tag">Approved</span>
       <h2 class="version-card__title">Concept 2</h2>
       <p class="version-card__desc">
-        Private banking — centred Jakob portrait on dark navy with four overlapping service rings. Hover a service to fill its circle with context.
+        Approved baseline (frozen reference). Private banking — centred Jakob portrait on dark navy with four overlapping service rings.
       </p>
       <span class="version-card__cta">Open</span>
     </a>
@@ -439,6 +448,24 @@ body {
       <h2 class="version-card__title">Concept 1</h2>
       <p class="version-card__desc">
         Hybrid hero — photo-strip breathes on its own; cursor takes priority and randomises height per reveal; idle hands control back to auto-cycle.
+      </p>
+      <span class="version-card__cta">Open</span>
+    </a>
+
+    <a class="version-card" href="sandbox/">
+      <span class="version-card__tag">Experimental</span>
+      <h2 class="version-card__title">Sandbox</h2>
+      <p class="version-card__desc">
+        Experimental ground for alternate variants — Variante B of Leistungen (numbered dark circles) and other fragments under iteration.
+      </p>
+      <span class="version-card__cta">Open</span>
+    </a>
+
+    <a class="version-card" href="uikit/">
+      <span class="version-card__tag">Foundations</span>
+      <h2 class="version-card__title">UI Kit</h2>
+      <p class="version-card__desc">
+        Single source of truth — design tokens, typography scale, colour palette, buttons, chips, and section components.
       </p>
       <span class="version-card__cta">Open</span>
     </a>
@@ -567,6 +594,7 @@ body {
   </p>
 </main>
 
-<script defer src="shared/service-menu.js?v=2"></script>
+<script src="shared/preview-config.js"></script>
+<script defer src="shared/service-menu.js"></script>
 </body>
 </html>
