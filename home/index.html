@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/tokens.css?v=2">
 <link rel="stylesheet" href="../shared/service-menu.css?v=3">
-<link rel="stylesheet" href="styles.css?v=59">
+<link rel="stylesheet" href="styles.css?v=62">
 </head>
 <body>
 
@@ -327,6 +327,32 @@
 
   </div>
 </section>
+
+<!--
+  Site footer — Swiss minimalism · 88px tall
+  Content sourced verbatim from the client wireframe.
+  Layout: logo (full 88 px height, left at gutter) ↔ meta block right
+  (copyright · legal links). Single horizontal line on desktop,
+  stacks below ~720 px viewport.
+-->
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+
+    <a class="site-footer__logo" href="../" aria-label="Schaad Advisors – zur Startseite">
+      <img src="../assets/LogoBig.svg" alt="Schaad Advisors">
+    </a>
+
+    <div class="site-footer__meta">
+      <p class="site-footer__copy">© 2026 Schaad Advisors LLC · Zürich, Schweiz</p>
+      <ul class="site-footer__links" aria-label="Rechtliche Hinweise">
+        <li><a href="#">Impressum</a></li>
+        <li><a href="#">Datenschutzerklärung</a></li>
+        <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a></li>
+      </ul>
+    </div>
+
+  </div>
+</footer>
 
 <script>
 /* ── Plus colour switch — white on dark hero, atlas-blue on white Leistungen.
