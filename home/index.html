@@ -213,22 +213,17 @@
 </section>
 
 <!--
-  Section 3 — CTA · Editorial Spread (client-approved canonical)
-  Symmetric 3-col grid on dark navy with photo overlay:
-    - 4 tags-left | centre copy + button | 4 tags-right
-    - Same photo bg + gradient overlay as the rings variant
+  Section 3 — CTA · Editorial 2-col on dark navy
+  Layout matches the FAQ section grid (5fr title / 7fr right column),
+  so the tag column's left edge aligns with the FAQ accordion column
+  one section below — single vertical guideline across the page.
+    - Left:  eyebrow + display H2 + body + button (all left-aligned)
+    - Right: 8 hairline-outline tag pills stacked vertically
 -->
 <section class="cta bg-studio" id="cta" aria-labelledby="cta-title">
   <div class="cta__inner">
 
-    <ul class="cta__tags cta__tags--left" aria-label="Themenfelder">
-      <li>Advocacy</li>
-      <li>Public Affairs</li>
-      <li>Strategieentwicklung</li>
-      <li>Polit. Risikomanagement</li>
-    </ul>
-
-    <div class="cta__center">
+    <div class="cta__lead">
       <p class="cta__eyebrow">Kontakt aufnehmen</p>
       <h2 class="cta__title" id="cta-title">Ihre Strategie an der Schnittstelle von Politik und Wirtschaft.</h2>
       <p class="cta__body">Haben Sie eine konkrete Frage oder ein regulatorisches Projekt, das Sie beschäftigt? Schildern Sie mir kurz Ihre Situation – ich melde mich innerhalb von 48 Stunden.</p>
@@ -238,7 +233,11 @@
       </a>
     </div>
 
-    <ul class="cta__tags cta__tags--right" aria-label="Themenfelder · Sektoren">
+    <ul class="cta__tags" aria-label="Themenfelder & Sektoren">
+      <li>Advocacy</li>
+      <li>Public Affairs</li>
+      <li>Strategieentwicklung</li>
+      <li>Polit. Risikomanagement</li>
       <li>Energiepolitik</li>
       <li>Finanzregulierung</li>
       <li>Rohstoffhandel</li>

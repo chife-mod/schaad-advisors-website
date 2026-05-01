@@ -95,7 +95,9 @@ img { display: block; max-width: 100%; }
 .hero {
   position: relative;
   width: 100vw;
-  height: max(800px, 100vh);
+  /* Compact hero — 720. Logo (full size), text and portrait fit
+     without overlap; rings bleed deeper into the white Leistungen. */
+  height: 720px;
   background: var(--bg-deep);              /* base; .bg-studio adds halo + grain */
   overflow: visible;                       /* rings bleed onto next section */
   z-index: 5;                              /* keep rings painted above Leistungen */
@@ -253,8 +255,8 @@ img { display: block; max-width: 100%; }
   position: absolute;
   left: calc(var(--gutter) + 568px);
   bottom: 0;
-  width:  538px;
-  height: 713px;
+  width:  468px;                  /* scaled to keep image aspect ratio at 620 high */
+  height: 620px;
   z-index: 3;                     /* sits BEHIND service rings */
   pointer-events: none;
 }
@@ -277,7 +279,7 @@ img { display: block; max-width: 100%; }
 .hero__lead {
   position: absolute;
   left:  calc(var(--gutter) + 80px);
-  bottom: 297px;            /* raised +40 above Figma y=543 baseline */
+  bottom: 220px;            /* clears 205-tall logo above with ~50px gap on hero=720 */
   width: 436px;
   z-index: 7;               /* above service rings (z=6) */
 }
@@ -354,7 +356,7 @@ img { display: block; max-width: 100%; }
 .hero__right {
   position: absolute;
   left:  calc(var(--gutter) + 1048px);
-  bottom: 377px;                /* raised +40 above body baseline (Figma y=463) */
+  bottom: 319px;                /* signature top aligns with lead headline top on hero=720 */
   width: 312px;
   z-index: 7;               /* above service rings (z=6) */
   display: flex;
@@ -398,27 +400,33 @@ img { display: block; max-width: 100%; }
   color: var(--white);
 }
 
-/* ─── Service rings strip · responsive 4 × 25vw grid ───────────
+/* ─── Service rings strip · 4 cells, capped at 1440 wide ───────
       Rings fill their cell exactly → tangent (edge-to-edge, no overlap).
       vector-effect="non-scaling-stroke" keeps stroke at 1px device-px.
-      Strip anchored bottom:-70px so rings bleed below viewport edge.  */
+      Strip width is capped to 1440 (the site's content rail) and centred
+      horizontally — on ultra-wide viewports the rings stop scaling instead
+      of growing into giant 25vw discs that swallow the composition.
+      Strip is anchored at hero bottom-70 so rings bleed onto the next
+      (white) section, regardless of hero height.                        */
 
 .hero__services {
+  --strip-w: min(100vw, 1440px);
   position: absolute;
-  left:   0;
-  bottom: -70px;
-  width:  100vw;
-  height: 25vw;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -140px;                  /* deeper bleed onto the white Leistungen */
+  width: var(--strip-w);
+  height: calc(var(--strip-w) / 4);
   display: grid;
-  grid-template-columns: repeat(4, 25vw);
+  grid-template-columns: repeat(4, 1fr);
   z-index: 6;
   pointer-events: none;
 }
 
 .hero__service {
   position: relative;
-  width:  25vw;
-  height: 25vw;
+  width:  100%;
+  aspect-ratio: 1 / 1;
   pointer-events: auto;
   cursor: pointer;
 }
@@ -443,7 +451,8 @@ img { display: block; max-width: 100%; }
   z-index: 1;
 }
 
-/* Photo overlay — same circle as the ring */
+/* Photo overlay — same circle as the ring.
+   Idle: hidden. Hover: full opacity, full colour (no dim filter). */
 
 .hero__service-photo {
   position: absolute;
@@ -452,7 +461,6 @@ img { display: block; max-width: 100%; }
   height: 100%;
   border-radius: 50%;
   background: center / cover no-repeat;
-  filter: grayscale(0.25) brightness(0.85) contrast(0.95);
   opacity: 0;
   pointer-events: none;
   z-index: 0;
@@ -461,6 +469,16 @@ img { display: block; max-width: 100%; }
 .hero__service:hover .hero__service-photo {
   opacity: 0.9;
   transition: opacity 0.7s ease-out;
+}
+
+/* Portrait desaturates whenever any service ring is hovered — focus
+   shifts from Jakob (the constant) to the service ring (the variable).
+   Modern :has() selector — supported in all current evergreen browsers. */
+.hero:has(.hero__service:hover) .hero__portrait img {
+  filter: grayscale(1);
+}
+.hero__portrait img {
+  transition: filter 0.7s ease;
 }
 
 /* Plus mark — sits on circumference at gap midpoint.
@@ -516,7 +534,9 @@ img { display: block; max-width: 100%; }
 .leistungen {
   background: #ffffff;
   color: var(--color-charcoal);
-  padding: clamp(72px, 10vw, 120px) 0;       /* unified rhythm: 120/120 like CTA + FAQ */
+  /* Top padding includes a +64 buffer below the hero rings strip so the
+     "Dienstleistungen" eyebrow clears the bleeding ring strokes. */
+  padding: clamp(136px, 14vw, 184px) 0 clamp(72px, 10vw, 120px);
 }
 
 .leistungen__inner {
@@ -637,50 +657,49 @@ img { display: block; max-width: 100%; }
 .cta__inner {
   padding: 0 var(--rail-pad);
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 6fr) minmax(0, 3fr);
-  gap: clamp(32px, 5vw, 64px);
-  align-items: center;
+  /* Match the FAQ grid (5fr / 7fr) so the tag column's left edge lines
+     up with the FAQ accordion column one section below. */
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(48px, 6vw, 96px);
+  align-items: start;
 }
 @media (max-width: 980px) {
   .cta__inner { grid-template-columns: 1fr; gap: 40px; }
 }
 
-/* Tag column — hairline-outline pills, equal width within column. */
+/* Tags — single vertical stack, pills sized to content, left-aligned at
+   the start of the right grid column. */
 
 .cta__tags {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 12px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 .cta__tags li {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 32px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 20px;
   border: 1px solid var(--color-alpine);
   border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-sans);
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-alpine);
   white-space: nowrap;
 }
 @media (max-width: 980px) {
   .cta__tags { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-  .cta__tags li { width: auto; }
-  .cta__tags--right { order: 3; }
-  .cta__tags--left  { order: 1; }
-  .cta__center      { order: 2; }
 }
 
-.cta__center { text-align: left; }
+.cta__lead { text-align: left; }
 
 .cta__eyebrow {
   display: inline-flex;
@@ -702,6 +721,9 @@ img { display: block; max-width: 100%; }
 }
 
 .cta__title {
+  /* Slightly tighter than Leistungen/FAQ display heads — body copy here
+     pushes the headline into 4 lines at the larger scale, so we step
+     down one notch (max 3 lines on desktop). */
   font-size: clamp(28px, 3.6vw, 44px);
   font-weight: 600;
   letter-spacing: -0.018em;
