@@ -1,5 +1,5 @@
 /**
- * Service Menu — preview-only floating navigator + 12-column grid toggle.
+ * Service Menu — preview-only floating navigator.
  *
  * Generic across projects. Configure per-project by setting either of these
  * BEFORE this script loads (or via a small inline <script> on each page):
@@ -17,7 +17,6 @@
  *   <script defer src="../shared/service-menu.js"></script>
  *
  * Falls back to a single "Launcher" version if nothing is configured.
- * Grid-overlay state persisted in localStorage as "preview-grid".
  */
 
 (function () {
@@ -78,17 +77,6 @@
     return (
       '<svg class="service-menu__caret" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
       '<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
-      "</svg>"
-    );
-  }
-
-  function svgGrid() {
-    return (
-      '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-      '<rect x="3.5" y="3.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
-      '<rect x="13.5" y="3.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
-      '<rect x="3.5" y="13.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
-      '<rect x="13.5" y="13.5" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1.5"/>' +
       "</svg>"
     );
   }
@@ -174,59 +162,7 @@
     });
   }
 
-  /* ── Grid overlay (12-column system reference) ──────────────
-     Independent of the version chip. Toggle button (circle) sits
-     to the LEFT of the chip; click flips the .grid-overlay
-     visibility. State persisted in localStorage so it stays on
-     across page navigation. */
-
-  function buildGrid() {
-    var overlay = document.createElement("div");
-    overlay.className = "grid-overlay";
-
-    var frame = document.createElement("div");
-    frame.className = "grid-overlay__frame";
-
-    var cols = document.createElement("div");
-    cols.className = "grid-overlay__cols";
-    for (var i = 0; i < 12; i++) {
-      var col = document.createElement("div");
-      col.className = "grid-overlay__col";
-      cols.appendChild(col);
-    }
-    frame.appendChild(cols);
-    overlay.appendChild(frame);
-    document.body.appendChild(overlay);
-
-    var btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "grid-toggle";
-    btn.setAttribute("aria-label", "Toggle 12-column grid overlay");
-    btn.innerHTML = svgGrid();
-
-    /* Attach inside .service-menu (created by build() above) so the toggle
-       sits as a flex sibling LEFT of the version capsule. */
-    var menu = document.querySelector(".service-menu");
-    if (menu) menu.insertBefore(btn, menu.firstChild);
-    else document.body.appendChild(btn);
-
-    var stored = false;
-    try { stored = localStorage.getItem("preview-grid") === "on"; } catch (_) {}
-    if (stored) {
-      overlay.classList.add("is-on");
-      btn.classList.add("is-on");
-    }
-
-    btn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      var on = !overlay.classList.contains("is-on");
-      overlay.classList.toggle("is-on", on);
-      btn.classList.toggle("is-on", on);
-      try { localStorage.setItem("preview-grid", on ? "on" : "off"); } catch (_) {}
-    });
-  }
-
-  function init() { build(); buildGrid(); }
+  function init() { build(); }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
